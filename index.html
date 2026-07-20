@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espelho Digital - Maratona Tech 2026</title>
+    <style>
+        /* --- ESTILOS GERAIS & TEMA --- */
+        :root {
+            --bg-dark: #0F172A;
+            --card-bg: #1E293B;
+            --accent-purple: #7C3AED;
+            --accent-blue: #2563EB;
+            --success-green: #10B981;
+            --alert-red: #EF4444;
+            --text-light: #F8FAFC;
+            --text-muted: #94A3B8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- CONTAINER DO SMARTPHONE / APP --- */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background-color: #0b1120;
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: 680px;
+        }
+
+        /* --- CABEÇALHO DA INTERFACE --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        /* --- TELAS E SEÇÕES --- */
+        .screen {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* --- BOTÕES --- */
+        .btn {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            color: var(--text-light);
+        }
+
+        .btn-danger {
+            background: var(--alert-red);
+        }
+
+        .btn-success {
+            background: var(--success-green);
+        }
+
+        /* --- MENSAGEM DE SIMULAÇÃO (FEED) --- */
+        .chat-box {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 15px;
+            border-left: 4px solid var(--accent-purple);
+            margin-bottom: 10px;
+        }
+
+        .chat-header {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* --- GRID DE MISSÕES --- */
+        .mission-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .mission-card {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .mission-card:hover {
+            border-color: var(--accent-purple);
+            background: #26334d;
+        }
+
+        .mission-card span {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* --- BARRA DE PROGRESSO --- */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-purple);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* --- NAVEGAÇÃO INFERIOR --- */
+        nav {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 15px;
+            border-top: 1px solid #334155;
+            margin-top: auto;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-btn.active {
+            color: var(--accent-purple);
+            font-weight: bold;
+        }
+
+        /* --- FORMULÁRIOS & MODAIS --- */
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: var(--card-bg);
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .feedback-box {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feedback-box.correct {
+            border: 1px solid var(--success-green);
+        }
+
+        .feedback-box.incorrect {
+            border: 1px solid var(--alert-red);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo">🪞 Espelho Digital</div>
+        <div class="stats">
+            <div class="stat-item">🔥 <span id="streak">1</span>d</div>
+            <div class="stat-item">⭐ <span id="xp">0</span> XP</div>
+        </div>
+    </header>
+
+    <section id="screen-home" class="screen active">
+        <div style="text-align: center; margin: auto 0;">
+            <span style="font-size: 4rem;">🛡️</span>
+            <h2 style="font-size: 1.8rem; margin-top: 10px;">Aprenda antes que aconteça.</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">
+                Simule situações reais da internet e treine seus reflexos contra golpes e desinformação.
+            </p>
+        </div>
+        <button class="btn" onclick="navigateTo('screen-missions')">Começar Missão</button>
+    </section>
+
+    <section id="screen-missions" class="screen">
+        <h2>Escolha um Desafio</h2>
+        <div class="mission-grid">
+            <div class="mission-card" onclick="startQuiz('fakenews')">
+                <span>📰</span>
+                <strong>Fake News</strong>
+            </div>
+            <div class="mission-card" onclick="startQuiz('golpes')">
+                <span>🎣</span>
+                <strong>Golpes</strong>
+            </div>
+            <div class="mission-card" onclick="startQuiz('deepfake')">
+                <span>🎭</span>
+                <strong>Deepfake</strong>
+            </div>
+            <div class="mission-card" onclick="startQuiz('seguranca')">
+                <span>🔒</span>
+                <strong>Segurança</strong>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-quiz" class="screen">
+        <div class="progress-bar">
+            <div id="quiz-progress" class="progress-fill"></div>
+        </div>
+        
+        <div class="chat-box">
+            <div class="chat-header">
+                <span id="quiz-sender">📱 Notificação Recebida</span>
+                <span>Agora</span>
+            </div>
+            <div id="quiz-content" class="chat-body">
+                Carregando pergunta...
+            </div>
+        </div>
+
+        <div id="quiz-options" style="display: flex; flex-direction: column; gap: 8px;">
+            </div>
+
+        <div id="feedback-box" class="feedback-box">
+            <h3 id="feedback-title"></h3>
+            <p id="feedback-text" style="font-size: 0.85rem; color: var(--text-muted);"></p>
+            <button class="btn" onclick="nextQuestion()">Próxima Rodada ➔</button>
+        </div>
+    </section>
+
+    <section id="screen-teacher" class="screen">
+        <h2>👨‍🏫 Painel do Professor</h2>
+        
+        <div id="teacher-auth" style="display: flex; flex-direction: column; gap: 10px; margin: auto 0;">
+            <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+                Acesso restrito. Digite a senha para visualizar os relatórios da turma.
+            </p>
+            <input type="password" id="teacher-pass" placeholder="Senha do Professor (padrão: 1234)">
+            <button class="btn" onclick="authTeacher()">Acessar Painel</button>
+            <p id="auth-error" style="color: var(--alert-red); font-size: 0.8rem; text-align: center; display: none;">
+                Senha incorreta! Tente novamente.
+            </p>
+        </div>
+
+        <div id="teacher-content" style="display: none; flex-direction: column; gap: 12px;">
+            <div style="background: var(--card-bg); padding: 12px; border-radius: 8px;">
+                <h4 style="margin-bottom: 5px;">📊 Desempenho Geral</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    • 80% de precisão em Fake News<br>
+                    • 45% de precisão em Golpes Digitais (Atenção!)
+                </p>
+            </div>
+            <div style="background: var(--card-bg); padding: 12px; border-radius: 8px;">
+                <h4 style="margin-bottom: 5px;">💡 Recomendação da IA</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    Recomenda-se aplicar uma atividade prática sobre links maliciosos e *phishing*.
+                </p>
+            </div>
+            <button class="btn btn-secondary" onclick="logoutTeacher()">Sair do Painel</button>
+        </div>
+    </section>
+
+    <section id="screen-creator" class="screen">
+        <h2>🛠️ Modo Criador</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Encontrou uma suspeita na internet? Envie aqui. A IA removerá dados pessoais e criará um desafio para a turma!
+        </p>
+        <form onsubmit="submitCustomChallenge(event)" style="display: flex; flex-direction: column; gap: 10px;">
+            <select id="create-category" required>
+                <option value="">Selecione a Categoria</option>
+                <option value="golpes">Golpes Digitais</option>
+                <option value="fakenews">Fake News</option>
+            </select>
+            <textarea id="create-text" rows="4" placeholder="Cole aqui a mensagem suspeita..." required></textarea>
+            <button type="submit" class="btn btn-success">Enviar para a IA Processar</button>
+        </form>
+    </section>
+
+    <nav>
+        <button class="nav-btn active" onclick="navigateTo('screen-home', this)">
+            🏠<span>Início</span>
+        </button>
+        <button class="nav-btn" onclick="navigateTo('screen-missions', this)">
+            🎯<span>Missões</span>
+        </button>
+        <button class="nav-btn" onclick="navigateTo('screen-creator', this)">
+            🛠️<span>Criar</span>
+        </button>
+        <button class="nav-btn" onclick="navigateTo('screen-teacher', this)">
+            👨‍🏫<span>Professor</span>
+        </button>
+    </nav>
+</div>
+
+<script>
+    /* --- DADOS DAS PERGUNTAS / RODADAS --- */
+    const questionBank = {
+        golpes: [
+            {
+                content: "URGENTE! Governo libera R$ 2.000 para estudantes. Clique aqui para receber: http://beneficio-fake.com",
+                options: [
+                    { text: "Verificar Informação", correct: true, feedback: "Excelente! A mensagem cria senso de urgência e usa um link não oficial (.com em vez de .gov.br)." },
+                    { text: "Compartilhar no Grupo", correct: false, feedback: "Atenção! Esta mensagem apresenta sinais claros de golpe: urgência e promessa de dinheiro fácil." },
+                    { text: "Clicar no Link", correct: false, feedback: "Cuidado! Clicar em links desconhecidos pode roubar seus dados ou infectar seu celular." }
+                ]
+            },
+            {
+                content: "Seu banco informa: Sua conta foi bloqueada por atividade suspeita. Atualize seus dados agora em: http://seu-banco-seguro-login.com",
+                options: [
+                    { text: "Acessar o link e atualizar", correct: false, feedback: "Erro! Bancos nunca solicitam recadastramento por SMS ou links externos." },
+                    { text: "Ignorar e checar no app oficial do banco", correct: true, feedback: "Correto! Sempre utilize os canais oficiais do banco para checar pendências." }
+                ]
+            }
+        ],
+        fakenews: [
+            {
+                content: "BOMBA! Cientistas descobrem que beber água fervida com alho cura qualquer vírus instantaneamente!",
+                options: [
+                    { text: "Checar em sites de checagem (ex: Aos Fatos)", correct: true, feedback: "Boa! Informações de saúde milagrosas sem comprovação científica costumam ser falsas." },
+                    { text: "Enviar para a família", correct: false, feedback: "Cuidado! Repassar notícias sem checar pode colocar a saúde de pessoas em risco." }
+                ]
+            }
+        ]
+    };
+
+    /* --- ESTADO DO JOGO --- */
+    let currentCategory = '';
+    let currentRound = 0;
+    let scoreXP = 0;
+    const TEACHER_PASSWORD = "1234"; // Senha configurada para o Painel
+
+    /* --- NAVEGAÇÃO --- */
+    function navigateTo(screenId, btnElement = null) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+
+        if (btnElement) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+    }
+
+    /* --- INICIAR RODADAS DO QUIZ --- */
+    function startQuiz(category) {
+        if (!questionBank[category]) {
+            alert('Em breve novas perguntas para esta categoria!');
+            return;
+        }
+        currentCategory = category;
+        currentRound = 0;
+        navigateTo('screen-quiz');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const questions = questionBank[currentCategory];
+        const total = questions.length;
+        
+        if (currentRound >= total) {
+            alert(`🎉 Missão Concluída! Você ganhou XP nessa rodada.`);
+            navigateTo('screen-missions');
+            return;
+        }
+
+        // Atualiza Barra de Progresso
+        const progressPercent = ((currentRound + 1) / total) * 100;
+        document.getElementById('quiz-progress').style.width = progressPercent + '%';
+
+        const q = questions[currentRound];
+        document.getElementById('quiz-content').innerText = `"${q.content}"`;
+
+        // Oculta feedback e mostra botões
+        document.getElementById('feedback-box').style.display = 'none';
+        const optionsDiv = document.getElementById('quiz-options');
+        optionsDiv.style.display = 'flex';
+        optionsDiv.innerHTML = '';
+
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-secondary';
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function selectOption(option) {
+        document.getElementById('quiz-options').style.display = 'none';
+        const feedbackBox = document.getElementById('feedback-box');
+        feedbackBox.style.display = 'flex';
+
+        if (option.correct) {
+            feedbackBox.className = 'feedback-box correct';
+            document.getElementById('feedback-title').innerText = '🟢 Boa decisão!';
+            scoreXP += 100;
+            document.getElementById('xp').innerText = scoreXP;
+        } else {
+            feedbackBox.className = 'feedback-box incorrect';
+            document.getElementById('feedback-title').innerText = '🔴 Atenção!';
+        }
+
+        document.getElementById('feedback-text').innerText = option.feedback;
+    }
+
+    function nextQuestion() {
+        currentRound++;
+        loadQuestion();
+    }
+
+    /* --- AUTENTICAÇÃO DO PROFESSOR --- */
+    function authTeacher() {
+        const inputPass = document.getElementById('teacher-pass').value;
+        const errorMsg = document.getElementById('auth-error');
+
+        if (inputPass === TEACHER_PASSWORD) {
+            document.getElementById('teacher-auth').style.display = 'none';
+            document.getElementById('teacher-content').style.display = 'flex';
+            errorMsg.style.display = 'none';
+            document.getElementById('teacher-pass').value = '';
+        } else {
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    function logoutTeacher() {
+        document.getElementById('teacher-auth').style.display = 'flex';
+        document.getElementById('teacher-content').style.display = 'none';
+    }
+
+    /* --- MODO CRIADOR --- */
+    function submitCustomChallenge(e) {
+        e.preventDefault();
+        const category = document.getElementById('create-category').value;
+        const text = document.getElementById('create-text').value;
+
+        // Adiciona dinamicamente ao banco de perguntas da sessão
+        if (!questionBank[category]) questionBank[category] = [];
+        
+        questionBank[category].push({
+            content: `[Enviado por Aluno] ${text}`,
+            options: [
+                { text: "Verificar e reportar", correct: true, feedback: "Muito bem! A comunidade agradece a ajuda na checagem." },
+                { text: "Acreditar de primeira", correct: false, feedback: "Lembre-se sempre de duvidar antes de divulgar." }
+            ]
+        });
+
+        alert("✨ Desafio enviado! A IA anonimizou a mensagem e adicionou ao banco de dados da escola.");
+        document.getElementById('create-text').value = '';
+        navigateTo('screen-missions');
+    }
+</script>
+
+</body>
+                                                               </html>
+                                                               
