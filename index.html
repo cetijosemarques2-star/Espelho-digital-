@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VB-ON — Várzea Branca On-Fire</title>
+    <title>VB-ON — Várzea Branca Conectada</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome para Ícones -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js para Gráficos Financeiros -->
+    <!-- Chart.js para o Financeiro -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'verde-intenso': '#0B8F24',
                         'verde-esmeralda': '#20C957',
-                        'verde-limao': '#70E52B',
-                        'roxo-profundo': '#351080',
-                        'roxo-vibrante': '#4B20A8',
-                        'lilas-suave': '#8B65D6',
-                        'graphite': '#1e293b',
-                        'slate-gray': '#f8fafc'
+                        'verde-intenso': '#10963D',
+                        'verde-limao': '#70E000',
+                        'grafite': '#1E293B',
+                        'roxo-profundo': '#3B0764',
+                        'slate-gray': '#F1F5F9'
                     }
                 }
             }
@@ -30,117 +28,137 @@
     </script>
     <style>
         .gradient-cet {
-            background: linear-gradient(110deg, #0B8F24, #20C957, #4B20A8, #351080);
+            background: linear-gradient(135deg, #3B0764 0%, #10963D 100%);
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #1E293B 0%, #3B0764 100%);
+        }
+        /* Custom scrollbar para mobile */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body class="bg-slate-gray font-sans text-graphite antialiased min-h-screen flex flex-col">
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300 bg-roxo-vibrante text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3">
-        <i class="fa-solid fa-circle-check text-verde-limao"></i>
-        <span id="toast-msg" class="text-sm font-bold">Ação realizada com sucesso!</span>
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300 bg-graphite text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm">
+        <i class="fa-solid fa-circle-check text-verde-esmeralda text-lg"></i>
+        <span id="toast-msg">Ação realizada com sucesso!</span>
     </div>
 
-    <!-- LAYOUT COM SIDEBAR ESQUERDA -->
-    <div class="flex flex-grow relative">
-        
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="w-64 bg-roxo-profundo text-white flex flex-col justify-between transition-all duration-300 z-30 sticky top-0 h-screen shadow-xl">
-            <div>
-                <!-- Header da Sidebar -->
-                <div class="p-5 flex items-center justify-between border-b border-white/10">
-                    <div id="sidebar-brand" class="flex items-center space-x-3 overflow-hidden">
-                        <div class="w-10 h-10 rounded-2xl gradient-cet flex items-center justify-center font-black text-white text-xl shadow-md shrink-0">VB</div>
-                        <div>
-                            <h1 class="font-black text-base tracking-wide whitespace-nowrap">VB-ON</h1>
-                            <p class="text-[10px] text-lilas-suave whitespace-nowrap">Várzea Branca • PI</p>
+    <!-- WRAPPER PRINCIPAL -->
+    <div class="flex flex-col lg:flex-row flex-grow min-h-screen">
+
+        <!-- SIDEBAR / MENU LATERAL (Responsivo para Mobile & Desktop) -->
+        <aside id="sidebar" class="bg-gradient-to-b from-grafite to-roxo-profundo text-white w-full lg:w-64 transition-all duration-300 flex flex-col justify-between shadow-xl z-30">
+            <div class="p-5 flex flex-col space-y-6">
+                <!-- Topo da Sidebar -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-2xl bg-verde-esmeralda flex items-center justify-center font-black text-white shadow-lg text-lg">VB</div>
+                        <div id="sidebar-brand">
+                            <h1 class="font-extrabold text-base tracking-wide">VB-ON</h1>
+                            <p class="text-[10px] text-verde-limao font-semibold">CETI José Marques</p>
                         </div>
                     </div>
-                    <button onclick="toggleSidebar()" class="text-white/70 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition-all shrink-0" title="Recolher menu">
-                        <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left"></i>
+                    <!-- Botão de Recolher (Apenas Desktop) -->
+                    <button onclick="toggleSidebar()" class="hidden lg:flex text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-all">
+                        <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
                 </div>
 
                 <!-- Navegação -->
-                <nav class="p-4 space-y-2">
-                    <button onclick="switchTab('inicio')" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm bg-white/10 text-verde-limao transition-all">
-                        <i class="fa-solid fa-store w-5"></i>
+                <nav class="space-y-1.5">
+                    <button onclick="switchTab('inicio')" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 text-verde-limao font-semibold text-sm transition-all shadow-sm">
+                        <i class="fa-solid fa-store w-5 text-center"></i>
                         <span class="sidebar-text">Catálogo & Vitrine</span>
                     </button>
-                    <button onclick="switchTab('favoritos')" id="nav-btn-favoritos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all">
-                        <i class="fa-solid fa-heart w-5 text-rose-400"></i>
+                    <button onclick="switchTab('favoritos')" id="nav-btn-favoritos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-medium text-sm transition-all">
+                        <i class="fa-solid fa-heart w-5 text-center text-rose-400"></i>
                         <span class="sidebar-text">Favoritos</span>
-                        <span id="fav-badge" class="ml-auto bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+                        <span id="fav-badge" class="ml-auto bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
                     </button>
-                    <button onclick="checkAdminAccess()" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all">
-                        <i class="fa-solid fa-chart-pie w-5 text-verde-esmeralda"></i>
-                        <span class="sidebar-text">Painel do Empreendedor</span>
+                    <button onclick="checkAdminAccess()" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-medium text-sm transition-all">
+                        <i class="fa-solid fa-chart-pie w-5 text-center text-verde-limao"></i>
+                        <span class="sidebar-text">Painel do Comerciante</span>
                     </button>
-                    <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all">
-                        <i class="fa-solid fa-user-plus w-5 text-lilas-suave"></i>
+                    <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-medium text-sm transition-all">
+                        <i class="fa-solid fa-user-plus w-5 text-center text-amber-400"></i>
                         <span class="sidebar-text">Cadastrar Negócio</span>
                     </button>
                 </nav>
             </div>
 
-            <!-- Rodapé da Sidebar / Sair -->
-            <div class="p-4 border-t border-white/10">
-                <button onclick="logoutAdmin()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-rose-300 hover:bg-rose-500/20 transition-all">
-                    <i class="fa-solid fa-right-from-bracket w-5"></i>
-                    <span class="sidebar-text">Sair / Trocar Conta</span>
-                </button>
+            <!-- Rodapé da Sidebar -->
+            <div class="p-4 border-t border-white/10 hidden lg:block">
+                <div class="bg-white/5 p-3 rounded-xl text-xs space-y-1">
+                    <p class="font-bold text-verde-limao">Várzea Branca - PI</p>
+                    <p class="text-white/60 text-[11px]">Tecnologia & Empreendedorismo Estudantil</p>
+                </div>
             </div>
         </aside>
 
         <!-- CONTEÚDO PRINCIPAL -->
-        <main class="flex-grow flex flex-col min-h-screen">
-            
-            <!-- Barra Superior Simples -->
-            <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-xs">
-                <div class="flex items-center space-x-2">
-                    <span class="bg-emerald-50 text-verde-intenso text-xs font-black px-3 py-1 rounded-full border border-emerald-200">CETI José Marques</span>
-                    <span class="text-xs text-gray-400 hidden sm:inline">| Desafio Liga Jovem & Maratona Tech</span>
+        <main class="flex-grow flex flex-col min-w-0">
+            <!-- HEADER SUPERIOR -->
+            <header class="bg-white border-b border-gray-200 px-4 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 sticky top-0 z-20 shadow-xs">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-black text-graphite">Plataforma VB-ON</h2>
+                    <p class="text-xs text-gray-500">Conectando o comércio local e impulsionando jovens empreendedores</p>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button onclick="checkAdminAccess()" class="bg-roxo-vibrante text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition-all">
-                        <i class="fa-solid fa-user-tie mr-1.5"></i> Área do Lojista
-                    </button>
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                    <div id="auth-status-bar" class="flex items-center gap-2">
+                        <!-- Injetado dinamicamente via JS -->
+                    </div>
                 </div>
             </header>
 
-            <div class="p-6 sm:p-10 flex-grow max-w-7xl mx-auto w-full">
-                
-                <!-- SEÇÃO: CATÁLOGO PÚBLICO -->
+            <!-- CONTAINER DAS ABAS -->
+            <div class="p-4 sm:p-8 flex-grow max-w-7xl w-full mx-auto">
+
+                <!-- TAB: INÍCIO / CATÁLOGO PÚBLICO -->
                 <section id="tab-inicio" class="space-y-6">
-                    <div class="gradient-cet rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
-                        <div class="relative z-10 max-w-2xl space-y-3">
-                            <span class="bg-white/20 backdrop-blur-md text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Várzea Branca • Piauí</span>
-                            <h2 class="text-3xl sm:text-5xl font-black tracking-tight">VB-ON — Conectando Comércio & Tecnologia</h2>
-                            <p class="text-white/90 text-sm sm:text-base leading-relaxed">Descubra e apoie os produtos locais de Várzea Branca. Negocie diretamente via WhatsApp com os empreendedores da nossa cidade!</p>
+                    <!-- Banner de Boas-Vindas -->
+                    <div class="gradient-header rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="space-y-3 z-10 text-center md:text-left">
+                            <span class="bg-verde-esmeralda/30 text-verde-limao text-xs font-bold px-3 py-1 rounded-full border border-verde-esmeralda/40">Inovação CETI José Marques</span>
+                            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Compre Local em Várzea Branca 🔥</h2>
+                            <p class="text-sm text-gray-300 max-w-xl">Descubra produtos artesanais, alimentos, roupas e serviços direto dos empreendedores da nossa cidade via WhatsApp com segurança e agilidade.</p>
                         </div>
+                        <div class="z-10 flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <button onclick="checkAdminAccess()" class="gradient-cet text-white font-bold px-6 py-3 rounded-2xl shadow-md hover:opacity-90 transition-all text-sm flex items-center justify-center gap-2 border border-white/20">
+                                <i class="fa-solid fa-store"></i> Acessar Meu Painel
+                            </button>
+                        </div>
+                        <!-- Círculos decorativos de fundo -->
+                        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-verde-esmeralda/20 rounded-full blur-2xl"></div>
                     </div>
 
-                    <!-- Filtros de Busca -->
-                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Pesquisar Produto</label>
-                            <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="O que você procura?" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                    <!-- Filtros e Busca -->
+                    <div class="bg-white p-4 sm:p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col lg:flex-row items-center gap-4">
+                        <div class="relative w-full lg:flex-grow">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Buscar por produto, descrição ou categoria..." class="w-full bg-slate-gray border border-gray-300 rounded-2xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Categoria</label>
-                            <select id="catalog-category" onchange="renderCatalog()" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                <option value="">Todas as Categorias</option>
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+                            <select id="catalog-category" onchange="renderCatalog()" class="w-full sm:w-48 bg-slate-gray border border-gray-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite font-medium">
+                                <option value="">Todas Categorias</option>
                                 <option value="Alimentação">Alimentação</option>
                                 <option value="Vestuário">Vestuário</option>
                                 <option value="Eletrônicos">Eletrônicos</option>
                                 <option value="Serviços">Serviços</option>
                                 <option value="Outros">Outros</option>
                             </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Ordenar Por</label>
-                            <select id="catalog-sort" onchange="renderCatalog()" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                            <select id="catalog-sort" onchange="renderCatalog()" class="w-full sm:w-48 bg-slate-gray border border-gray-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite font-medium">
                                 <option value="recentes">Mais Recentes</option>
                                 <option value="menor-preco">Menor Preço</option>
                                 <option value="maior-preco">Maior Preço</option>
@@ -154,78 +172,116 @@
                     </div>
                 </section>
 
-                <!-- SEÇÃO: FAVORITOS -->
+                <!-- TAB: FAVORITOS -->
                 <section id="tab-favoritos" class="hidden space-y-6">
-                    <h3 class="text-2xl font-black text-graphite">Seus Produtos Favoritos ❤️</h3>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-extrabold text-graphite">Meus Produtos Favoritos</h3>
+                    </div>
                     <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Injetado via JS -->
                     </div>
                 </section>
 
-                <!-- SEÇÃO: CADASTRO / LOGIN DO LOJISTA -->
-                <section id="tab-cadastro" class="hidden max-w-md mx-auto py-12">
-                    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl space-y-6">
-                        <div class="text-center space-y-2">
-                            <div class="w-12 h-12 rounded-2xl gradient-cet mx-auto flex items-center justify-center text-white font-bold text-2xl shadow-md">VB</div>
-                            <h3 class="text-xl font-black text-graphite">Área do Empreendedor VB-ON</h3>
-                            <p class="text-xs text-gray-500">Cadastre seu negócio para gerenciar produtos, estoque e finanças.</p>
+                <!-- TAB: CADASTRO DE NOVO NEGÓCIO -->
+                <section id="tab-cadastro" class="hidden space-y-6 max-w-xl mx-auto">
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xl">
+                        <div class="text-center mb-6">
+                            <div class="w-12 h-12 bg-emerald-100 text-verde-intenso rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
+                                <i class="fa-solid fa-store"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-graphite">Cadastre seu Negócio no VB-ON</h3>
+                            <p class="text-xs text-gray-500 mt-1">Crie sua conta para gerenciar produtos, estoque e financeiro</p>
                         </div>
                         <form onsubmit="handlePublicRegister(event)" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-bold text-gray-600 mb-1">Nome do Negócio</label>
-                                <input type="text" id="reg-input-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-verde-esmeralda focus:outline-none text-graphite">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Negócio / Loja</label>
+                                <input type="text" id="reg-input-name" required placeholder="Ex: Doces da Dona Maria" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-600 mb-1">Usuário / Login</label>
-                                <input type="text" id="reg-input-user" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-verde-esmeralda focus:outline-none text-graphite">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nome de Usuário (Login)</label>
+                                <input type="text" id="reg-input-user" required placeholder="Ex: maria123" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-600 mb-1">Senha</label>
-                                <input type="password" id="reg-input-pass" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-verde-esmeralda focus:outline-none text-graphite">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Senha de Acesso</label>
+                                <input type="password" id="reg-input-pass" required placeholder="••••••••" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                             </div>
-                            <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Entrar / Cadastrar</button>
+                            <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Criar Conta e Entrar</button>
                         </form>
                     </div>
                 </section>
 
-                <!-- SEÇÃO: PAINEL DO EMPREENDEDOR -->
+                <!-- TAB: PAINEL DO COMERCIANTE (DASHBOARD) -->
                 <section id="tab-painel" class="hidden space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
+                    <!-- Top Bar do Painel -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
                         <div>
                             <span class="text-xs font-bold text-verde-intenso uppercase tracking-wider">Painel Administrativo</span>
-                            <h3 id="merchant-welcome-name" class="text-xl font-black text-graphite">Painel do Lojista</h3>
+                            <h3 class="text-xl font-black text-graphite" id="merchant-welcome-name">Bem-vindo ao Painel</h3>
                         </div>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="openProfileModal()" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-4 py-2.5 rounded-xl transition-all"><i class="fa-solid fa-gear mr-1.5"></i> Configurações</button>
-                            <button onclick="openProductModal()" class="gradient-cet text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all"><i class="fa-solid fa-plus mr-1.5"></i> Novo Produto</button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="openProfileModal()" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-gear"></i> Configurações
+                            </button>
+                            <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-right-from-bracket"></i> Sair
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Subtabs do Painel -->
-                    <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
-                        <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn bg-verde-esmeralda text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all"><i class="fa-solid fa-box mr-1.5"></i> Meus Produtos & Estoque</button>
-                        <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-wallet mr-1.5"></i> Gestão Financeira</button>
-                        <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-cart-shopping mr-1.5"></i> Registro de Vendas</button>
-                        <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-calculator mr-1.5"></i> Calculadora Comercial</button>
-                        <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-chart-line mr-1.5"></i> Simulador de Viabilidade</button>
+                    <!-- Subnav do Painel -->
+                    <div class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
+                        <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-verde-esmeralda text-white shadow-sm">
+                            <i class="fa-solid fa-boxes-stacked mr-1.5"></i> Produtos & Estoque
+                        </button>
+                        <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
+                            <i class="fa-solid fa-wallet mr-1.5"></i> Financeiro & Caixa
+                        </button>
+                        <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
+                            <i class="fa-solid fa-cart-shopping mr-1.5"></i> Registrar Vendas
+                        </button>
+                        <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
+                            <i class="fa-solid fa-calculator mr-1.5"></i> Calculadora
+                        </button>
+                        <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
+                            <i class="fa-solid fa-chart-line mr-1.5"></i> Simulador de Negócios
+                        </button>
                     </div>
 
-                    <!-- SUBTAB: PRODUTOS & ESTOQUE -->
+                    <!-- SUBTAB: PRODUTOS E ESTOQUE -->
                     <div id="subtab-produtos" class="space-y-6">
-                        <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-graphite text-base">Meus Produtos Cadastrados</h4>
+                            <button onclick="openProductModal()" class="gradient-cet text-white font-bold px-4 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Novo Produto
+                            </button>
+                        </div>
+                        <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <!-- Injetado via JS -->
                         </div>
                     </div>
 
-                    <!-- SUBTAB: GESTÃO FINANCEIRA -->
+                    <!-- SUBTAB: FINANCEIRO -->
                     <div id="subtab-financeiro" class="hidden space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <h3 class="text-lg font-bold text-graphite">Controle de Caixa & Finanças</h3>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button onclick="openExpenseModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm">
+                                    <i class="fa-solid fa-receipt mr-1"></i> Novo Lançamento (Custo/Despesa)
+                                </button>
+                                <button onclick="exportFinancialPDF()" class="bg-verde-intenso hover:opacity-90 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm">
+                                    <i class="fa-solid fa-file-arrow-down mr-1"></i> Exportar Relatório TXT
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KPIs Financeiros -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Geral</p>
-                                <h4 class="text-2xl font-extrabold text-verde-intenso" id="kpi-receita">R$ 0,00</h4>
+                                <h4 class="text-2xl font-extrabold text-verde-esmeralda" id="kpi-receita">R$ 0,00</h4>
                             </div>
                             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos</p>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos (Produtos)</p>
                                 <h4 class="text-2xl font-extrabold text-amber-600" id="kpi-custos">R$ 0,00</h4>
                             </div>
                             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
@@ -242,28 +298,26 @@
                             </div>
                         </div>
 
-                        <!-- Gráficos -->
+                        <!-- Gráficos Financeiros -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                                <h4 class="font-bold text-graphite mb-4">Fluxo Financeiro (Receitas x Gastos)</h4>
-                                <div class="h-64"><canvas id="financeChart1"></canvas></div>
+                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-80 flex flex-col">
+                                <h4 class="font-bold text-graphite mb-4 text-sm">Receitas vs Gastos</h4>
+                                <div class="relative flex-grow">
+                                    <canvas id="financeChart1"></canvas>
+                                </div>
                             </div>
-                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                                <h4 class="font-bold text-graphite mb-4">Composição de Custos e Despesas</h4>
-                                <div class="h-64"><canvas id="financeChart2"></canvas></div>
+                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-80 flex flex-col">
+                                <h4 class="font-bold text-graphite mb-4 text-sm">Distribuição de Custos</h4>
+                                <div class="relative flex-grow">
+                                    <canvas id="financeChart2"></canvas>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Lançamentos Table -->
+                        <!-- Tabela de Lançamentos -->
                         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                                <span class="font-bold text-graphite">Histórico de Lançamentos</span>
-                                <div class="flex gap-2">
-                                    <button onclick="openExpenseModal()" class="gradient-cet text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:opacity-90"><i class="fa-solid fa-plus mr-1"></i> Novo Lançamento</button>
-                                    <button onclick="exportFinancialPDF()" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-4 py-2 rounded-xl"><i class="fa-solid fa-download mr-1"></i> Exportar Relatório</button>
-                                </div>
-                            </div>
-                            <div class="overflow-x-auto"                            <div class="overflow-x-auto">
+                            <div class="px-6 py-4 border-b border-gray-200 font-bold text-graphite">Histórico de Movimentações</div>
+                            <div class="overflow-x-auto">
                                 <table class="w-full text-left text-sm">
                                     <thead class="bg-slate-gray text-gray-600 uppercase text-xs">
                                         <tr>
@@ -482,8 +536,36 @@
                 </section>
             </div>
 
+            <!-- CHAT FLUTUANTE DE SUPORTE / IA (RESTAURADO NO CATÁLOGO) -->
+            <div class="fixed bottom-6 right-6 z-40">
+                <div id="chat-window" class="hidden bg-white w-80 sm:w-96 rounded-3xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden mb-4 transition-all duration-300">
+                    <div class="gradient-header text-white px-5 py-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-verde-esmeralda flex items-center justify-center font-bold text-sm">IA</div>
+                            <div>
+                                <h4 class="font-bold text-sm">Assistente VB-ON</h4>
+                                <p class="text-[10px] text-verde-limao">Online • Tire suas dúvidas</p>
+                            </div>
+                        </div>
+                        <button onclick="toggleChat()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    </div>
+                    <div id="chat-messages" class="p-4 h-72 overflow-y-auto space-y-3 text-xs bg-slate-gray flex flex-col">
+                        <div class="bg-white p-3 rounded-2xl rounded-tl-sm shadow-xs max-w-[85%] text-graphite self-start">
+                            Olá! Sou o assistente virtual do VB-ON. Como posso ajudar você a encontrar produtos ou usar a plataforma hoje?
+                        </div>
+                    </div>
+                    <div class="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
+                        <input type="text" id="chat-input" onkeypress="handleChatKey(event)" placeholder="Digite sua dúvida..." class="flex-grow bg-slate-gray border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                        <button onclick="sendChatMessage()" class="gradient-cet text-white px-4 py-2 rounded-xl text-xs font-bold hover:opacity-90"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="gradient-cet text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-xl hover:scale-105 transition-all ml-auto">
+                    <i class="fa-solid fa-comments"></i>
+                </button>
+            </div>
+
             <!-- FOOTER -->
-            <footer class="mt-16 py-6 text-center text-sm text-gray-500 border-t border-gray-200">
+            <footer class="mt-16 py-6 text-center text-sm text-gray-500 border-t border-gray-200 px-4">
                 <p class="font-bold text-graphite">VB-ON — CETI José Marques • Várzea Branca, Piauí</p>
                 <p class="mt-1">Várzea branca on-fire 🔥 | Tecnologia • Empreendedorismo • Conexão</p>
             </footer>
@@ -492,7 +574,7 @@
 
     <!-- MODAL: PRODUTO -->
     <div id="product-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-3xl max-w-xl w-full p-8 shadow-2xl relative my-8">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
             <button onclick="closeProductModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             <h3 class="text-xl font-extrabold text-graphite mb-6" id="product-modal-title">Cadastrar Novo Produto</h3>
 
@@ -536,7 +618,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp para Contato (com DDD, ex: 5589999999999)</label>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp para Contato (com DDD)</label>
                     <input type="text" id="prod-whatsapp" placeholder="5589999999999" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                 </div>
 
@@ -552,7 +634,7 @@
 
     <!-- MODAL: DADOS COMERCIAIS -->
     <div id="profile-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
             <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             <h3 class="text-xl font-extrabold text-graphite mb-6">Configurações Comerciais</h3>
 
@@ -576,7 +658,7 @@
 
     <!-- MODAL: LANÇAMENTO FINANCEIRO -->
     <div id="expense-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
             <button onclick="closeExpenseModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             <h3 class="text-xl font-extrabold text-graphite mb-6">Registrar Lançamento Financeiro</h3>
 
@@ -652,20 +734,53 @@
 
             isSidebarCollapsed = !isSidebarCollapsed;
             if(isSidebarCollapsed) {
-                sidebar.classList.remove('w-64');
-                sidebar.classList.add('w-20');
+                sidebar.classList.remove('lg:w-64');
+                sidebar.classList.add('lg:w-20');
                 texts.forEach(t => t.classList.add('hidden'));
                 brand.classList.add('hidden');
                 icon.classList.remove('fa-chevron-left');
                 icon.classList.add('fa-chevron-right');
             } else {
-                sidebar.classList.remove('w-20');
-                sidebar.classList.add('w-64');
+                sidebar.classList.remove('lg:w-20');
+                sidebar.classList.add('lg:w-64');
                 texts.forEach(t => t.classList.remove('hidden'));
                 brand.classList.remove('hidden');
                 icon.classList.remove('fa-chevron-right');
                 icon.classList.add('fa-chevron-left');
             }
+        }
+
+        // --- CHAT IA WIDGET ---
+        function toggleChat() {
+            const win = document.getElementById('chat-window');
+            win.classList.toggle('hidden');
+        }
+
+        function handleChatKey(e) {
+            if(e.key === 'Enter') sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const container = document.getElementById('chat-messages');
+            container.innerHTML += `<div class="bg-purple-100 text-purple-900 p-3 rounded-2xl rounded-tr-sm shadow-xs max-w-[85%] self-end">${text}</div>`;
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                let reply = "Que bacana sua dúvida! No VB-ON você pode navegar pelas categorias, favoritar itens e negociar direto com o vendedor pelo WhatsApp. Se for comerciante, acesse seu painel para gerenciar produtos e finanças!";
+                const lower = text.toLowerCase();
+                if(lower.includes('bolo') || lower.includes('comida')) {
+                    reply = "Temos ótimas opções de alimentação artesanal em Várzea Branca no catálogo principal!";
+                } else if(lower.includes('ajuda') || lower.includes('painel')) {
+                    reply = "Basta clicar em 'Cadastrar Negócio' ou 'Acessar Meu Painel' no menu para gerenciar seu estoque e caixa.";
+                }
+                container.innerHTML += `<div class="bg-white p-3 rounded-2xl rounded-tl-sm shadow-xs max-w-[85%] text-graphite self-start">${reply}</div>`;
+                container.scrollTop = container.scrollHeight;
+            }, 600);
         }
 
         // --- NAVIGATION TABS ---
@@ -675,7 +790,7 @@
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-white/10', 'text-verde-limao');
-                btn.classList.add('text-white/80');
+            btn.classList.add('text-white/80');
             });
             const activeBtn = document.getElementById('nav-btn-' + tabId);
             if(activeBtn) {
@@ -706,6 +821,22 @@
             if(subId === 'calculadora') renderCalcHistory();
         }
 
+        // --- AUTH & HEADER STATUS ---
+        function updateAuthBar() {
+            const bar = document.getElementById('auth-status-bar');
+            if(db.currentUser) {
+                const m = db.merchants.find(item => item.user === db.currentUser);
+                bar.innerHTML = `
+                    <span class="text-xs font-bold text-verde-intenso hidden sm:inline">Olá, ${m ? m.name : db.currentUser}</span>
+                    <button onclick="switchTab('painel'); switchSubTab('produtos');" class="gradient-cet text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm">Meu Painel</button>
+                `;
+            } else {
+                bar.innerHTML = `
+                    <button onclick="switchTab('cadastro')" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-3 py-2 rounded-xl transition-all">Cadastrar Loja</button>
+                `;
+            }
+        }
+
         // --- WHATSAPP DIRECT INTEGRATION ---
         function openWhatsAppChat(phone, productName) {
             const cleanPhone = phone.replace(/\D/g, '');
@@ -713,7 +844,6 @@
             window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
         }
 
-        // --- AUTH & PUBLIC REGISTER ---
         function checkAdminAccess() {
             if(!db.currentUser) {
                 switchTab('cadastro');
@@ -738,6 +868,7 @@
             db.merchants.push({ user, pass, name, hours: 'Seg a Sex, 08h às 18h', whatsapp: '5589999999999' });
             db.currentUser = user;
             saveDB();
+            updateAuthBar();
             showToast('Cadastro realizado com sucesso!');
             switchTab('painel');
             switchSubTab('produtos');
@@ -746,6 +877,7 @@
         function logoutAdmin() {
             db.currentUser = null;
             saveDB();
+            updateAuthBar();
             switchTab('inicio');
             showToast('Sessão encerrada.');
         }
@@ -1165,7 +1297,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { position: 'bottom' } }
-                   }
+                }
             });
         }
 
@@ -1356,6 +1488,7 @@
         }
 
         // Inicialização
+        updateAuthBar();
         updateFavBadge();
         renderCatalog();
     </script>
