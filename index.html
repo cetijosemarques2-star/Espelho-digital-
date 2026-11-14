@@ -3,278 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VB-ON — Várzea Branca, Piauí</title>
+    <title>VB-ON — Várzea Branca On-Fire</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome para Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js para o Painel Financeiro -->
+    <!-- Chart.js para Gráficos Financeiros -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'verde-intenso': '#0B8F24',
+                        'verde-esmeralda': '#20C957',
+                        'verde-limao': '#70E52B',
+                        'roxo-profundo': '#351080',
+                        'roxo-vibrante': '#4B20A8',
+                        'lilas-suave': '#8B65D6',
+                        'graphite': '#1e293b',
+                        'slate-gray': '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .bg-navy { background-color: #102F4A; }
-        .text-navy { color: #102F4A; }
-        .bg-emerald-custom { background-color: #00866A; }
-        .text-emerald-custom { color: #00866A; }
-        .border-emerald-custom { border-color: #00866A; }
-        .bg-tech-green { background-color: #20C997; }
-        .text-tech-green { color: #20C997; }
-        .bg-slate-gray { background-color: #EAF1F6; }
-        .text-graphite { color: #263746; }
+        .gradient-cet {
+            background: linear-gradient(110deg, #0B8F24, #20C957, #4B20A8, #351080);
+        }
     </style>
 </head>
-<body class="bg-slate-gray text-graphite font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-slate-gray font-sans text-graphite antialiased min-h-screen flex flex-col">
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
-        <div class="bg-navy text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium border border-white/10">
-            <i class="fa-solid fa-circle-check text-tech-green text-lg"></i>
-            <span id="toast-msg">Ação realizada com sucesso!</span>
-        </div>
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300 bg-roxo-vibrante text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3">
+        <i class="fa-solid fa-circle-check text-verde-limao"></i>
+        <span id="toast-msg" class="text-sm font-bold">Ação realizada com sucesso!</span>
     </div>
 
-    <div class="flex flex-col md:flex-row min-h-screen">
+    <!-- LAYOUT COM SIDEBAR ESQUERDA -->
+    <div class="flex flex-grow relative">
         
-        <!-- SIDEBAR (MENU LATERAL ESQUERDO) -->
-        <aside class="w-full md:w-72 bg-navy text-white flex flex-col justify-between p-6 shadow-xl z-30 shrink-0">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-64 bg-roxo-profundo text-white flex flex-col justify-between transition-all duration-300 z-30 sticky top-0 h-screen shadow-xl">
             <div>
-                <!-- Logo & Nome -->
-                <div class="flex items-center space-x-3 mb-8 cursor-pointer" onclick="switchTab('inicio')">
-                    <div id="logo-container" class="w-12 h-12 rounded-2xl bg-emerald-custom flex items-center justify-center text-white text-xl font-black shadow-md overflow-hidden">
-                        <img src="logo.png" alt="VB" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
-                        <span id="logo-fallback" class="hidden w-full h-full items-center justify-center bg-emerald-custom text-white">VB</span>
+                <!-- Header da Sidebar -->
+                <div class="p-5 flex items-center justify-between border-b border-white/10">
+                    <div id="sidebar-brand" class="flex items-center space-x-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-2xl gradient-cet flex items-center justify-center font-black text-white text-xl shadow-md shrink-0">VB</div>
+                        <div>
+                            <h1 class="font-black text-base tracking-wide whitespace-nowrap">VB-ON</h1>
+                            <p class="text-[10px] text-lilas-suave whitespace-nowrap">Várzea Branca • PI</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="font-black text-xl tracking-tight text-white">VB<span class="text-tech-green">-ON</span></h1>
-                        <p class="text-xs text-slate-gray font-medium">Várzea Branca — Piauí</p>
-                    </div>
+                    <button onclick="toggleSidebar()" class="text-white/70 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition-all shrink-0" title="Recolher menu">
+                        <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left"></i>
+                    </button>
                 </div>
 
-                <!-- Navigation Links Organizados -->
-                <nav class="space-y-2">
-                    <button onclick="switchTab('inicio')" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-emerald-custom bg-white/10 transition-all text-left">
-                        <i class="fa-solid fa-house w-5"></i>
-                        <span>Início & Catálogo</span>
-                    </button>
-                    <button onclick="switchTab('chat')" id="nav-btn-chat" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
-                        <i class="fa-solid fa-comments w-5"></i>
-                        <span>Chat Geral / Negociação</span>
-                    </button>
-                    <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
-                        <i class="fa-solid fa-user-plus w-5"></i>
-                        <span>Cadastrar na Plataforma</span>
-                    </button>
-                    <button onclick="checkAdminAccess()" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
+                <!-- Navegação -->
+                <nav class="p-4 space-y-2">
+                    <button onclick="switchTab('inicio')" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm bg-white/10 text-verde-limao transition-all">
                         <i class="fa-solid fa-store w-5"></i>
-                        <span>Painel do Comerciante</span>
+                        <span class="sidebar-text">Catálogo & Vitrine</span>
                     </button>
-                    <button onclick="switchTab('favoritos')" id="nav-btn-favoritos" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-heart w-5 text-rose-400"></i>
-                            <span>Favoritos</span>
-                        </div>
-                        <span id="fav-badge" class="bg-emerald-custom text-white px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+                    <button onclick="switchTab('favoritos')" id="nav-btn-favoritos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all">
+                        <i class="fa-solid fa-heart w-5 text-rose-400"></i>
+                        <span class="sidebar-text">Favoritos</span>
+                        <span id="fav-badge" class="ml-auto bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                    <button onclick="checkAdminAccess()" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all">
+                        <i class="fa-solid fa-chart-pie w-5 text-verde-esmeralda"></i>
+                        <span class="sidebar-text">Painel do Empreendedor</span>
+                    </button>
+                    <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-white/80 hover:bg-white/10 hover:text-white transition-all">
+                        <i class="fa-solid fa-user-plus w-5 text-lilas-suave"></i>
+                        <span class="sidebar-text">Cadastrar Negócio</span>
                     </button>
                 </nav>
             </div>
 
-            <!-- Footer / Info no Sidebar -->
-            <div class="pt-6 border-t border-white/10 text-xs text-slate-gray/70">
-                <p class="font-bold text-white mb-1">Várzea branca on-fire 🔥</p>
-                <p>Tecnologia • Empreendedorismo • Conexão</p>
+            <!-- Rodapé da Sidebar / Sair -->
+            <div class="p-4 border-t border-white/10">
+                <button onclick="logoutAdmin()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-sm text-rose-300 hover:bg-rose-500/20 transition-all">
+                    <i class="fa-solid fa-right-from-bracket w-5"></i>
+                    <span class="sidebar-text">Sair / Trocar Conta</span>
+                </button>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-grow p-4 sm:p-8 overflow-y-auto">
-            <div class="max-w-6xl mx-auto space-y-8">
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="flex-grow flex flex-col min-h-screen">
+            
+            <!-- Barra Superior Simples -->
+            <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-xs">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-emerald-50 text-verde-intenso text-xs font-black px-3 py-1 rounded-full border border-emerald-200">CETI José Marques</span>
+                    <span class="text-xs text-gray-400 hidden sm:inline">| Desafio Liga Jovem & Maratona Tech</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="checkAdminAccess()" class="bg-roxo-vibrante text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition-all">
+                        <i class="fa-solid fa-user-tie mr-1.5"></i> Área do Lojista
+                    </button>
+                </div>
+            </header>
 
-                <!-- 1. SEÇÃO INÍCIO & CATÁLOGO -->
-                <section id="tab-inicio" class="space-y-8">
-                    <!-- Hero Banner -->
-                    <div class="relative rounded-3xl bg-navy text-white p-6 sm:p-8 overflow-hidden shadow-xl space-y-4">
-                        <span class="bg-emerald-custom/20 text-tech-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Várzea branca on-fire 🔥</span>
-                        <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">TECNOLOGIA • EMPREENDEDORISMO • CONEXÃO</h2>
-                        <p class="text-slate-gray text-xs sm:text-sm leading-relaxed max-w-2xl">Divulgue seus produtos, conecte-se com clientes via chat integrado, gerencie suas finanças e simule o crescimento do seu empreendimento.</p>
-                    </div>
-
-                    <!-- Filtros e Busca do Catálogo -->
-                    <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <h3 class="text-xl font-black text-graphite">Vitrine do Comércio Local</h3>
-                                <p class="text-xs text-gray-500">Conectando compradores e comerciantes em Várzea Branca.</p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Buscar produtos..." class="bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
-                                <select id="catalog-category" onchange="renderCatalog()" class="bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
-                                    <option value="">Todas as Categorias</option>
-                                    <option value="Alimentação">Alimentação</option>
-                                    <option value="Vestuário">Vestuário</option>
-                                    <option value="Eletrônicos">Eletrônicos</option>
-                                    <option value="Serviços">Serviços</option>
-                                    <option value="Outros">Outros</option>
-                                </select>
-                                <select id="catalog-sort" onchange="renderCatalog()" class="bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
-                                    <option value="recentes">Mais Recentes</option>
-                                    <option value="menor-preco">Menor Preço</option>
-                                    <option value="maior-preco">Maior Preço</option>
-                                </select>
-                            </div>
+            <div class="p-6 sm:p-10 flex-grow max-w-7xl mx-auto w-full">
+                
+                <!-- SEÇÃO: CATÁLOGO PÚBLICO -->
+                <section id="tab-inicio" class="space-y-6">
+                    <div class="gradient-cet rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
+                        <div class="relative z-10 max-w-2xl space-y-3">
+                            <span class="bg-white/20 backdrop-blur-md text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Várzea Branca • Piauí</span>
+                            <h2 class="text-3xl sm:text-5xl font-black tracking-tight">VB-ON — Conectando Comércio & Tecnologia</h2>
+                            <p class="text-white/90 text-sm sm:text-base leading-relaxed">Descubra e apoie os produtos locais de Várzea Branca. Negocie diretamente via WhatsApp com os empreendedores da nossa cidade!</p>
                         </div>
                     </div>
 
-                    <!-- Grid de Produtos com Capa, Preço Próximo ao Chat e Responsivo -->
+                    <!-- Filtros de Busca -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Pesquisar Produto</label>
+                            <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="O que você procura?" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Categoria</label>
+                            <select id="catalog-category" onchange="renderCatalog()" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                                <option value="">Todas as Categorias</option>
+                                <option value="Alimentação">Alimentação</option>
+                                <option value="Vestuário">Vestuário</option>
+                                <option value="Eletrônicos">Eletrônicos</option>
+                                <option value="Serviços">Serviços</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Ordenar Por</label>
+                            <select id="catalog-sort" onchange="renderCatalog()" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                                <option value="recentes">Mais Recentes</option>
+                                <option value="menor-preco">Menor Preço</option>
+                                <option value="maior-preco">Maior Preço</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Produtos -->
                     <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Injetado via JS -->
                     </div>
                 </section>
 
-                <!-- 2. SEÇÃO CHAT CLIENTE / VENDEDOR -->
-                <section id="tab-chat" class="hidden space-y-6">
-                    <div class="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden flex flex-col h-[650px]">
-                        <!-- Chat Header -->
-                        <div class="bg-navy text-white p-4 sm:p-6 flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full bg-emerald-custom flex items-center justify-center font-bold text-white">
-                                    <i class="fa-solid fa-comments"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-base">Chat VB-ON (Negociação Direta)</h3>
-                                    <p class="text-xs text-tech-green">Converse com clientes e comerciantes</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <select id="chat-sender-role" onchange="switchChatSender()" class="bg-white/10 border border-white/20 text-white rounded-xl px-3 py-1.5 text-xs focus:outline-none">
-                                    <option value="Cliente" class="text-graphite">Entrar como Cliente</option>
-                                    <option value="Vendedor" class="text-graphite">Entrar como Vendedor</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Chat Messages Body -->
-                        <div id="chat-messages-container" class="flex-grow p-4 sm:p-6 overflow-y-auto space-y-4 bg-slate-gray/50">
-                            <!-- Injetado via JS -->
-                        </div>
-
-                        <!-- Chat Input Footer -->
-                        <div class="p-4 bg-white border-t border-gray-200">
-                            <form onsubmit="handleChatSubmit(event)" class="flex gap-2">
-                                <input type="text" id="chat-input-msg" required placeholder="Digite sua mensagem de negociação..." class="flex-grow bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
-                                <button type="submit" class="bg-emerald-custom text-white font-bold px-6 py-3 rounded-xl shadow-md hover:opacity-95 transition-all text-sm flex items-center gap-2">
-                                    <i class="fa-solid fa-paper-plane"></i> Enviar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 3. SEÇÃO CADASTRO NA PLATAFORMA -->
-                <section id="tab-cadastro" class="hidden space-y-6 max-w-xl mx-auto">
-                    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl">
-                        <div class="text-center mb-6">
-                            <div class="w-16 h-16 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl mx-auto mb-3 shadow-md">
-                                <i class="fa-solid fa-user-plus text-tech-green"></i>
-                            </div>
-                            <h3 class="text-2xl font-extrabold text-graphite">Cadastre seu Negócio no VB-ON</h3>
-                            <p class="text-gray-500 text-xs mt-1">Crie sua conta para divulgar produtos e usar o painel financeiro</p>
-                        </div>
-
-                        <form onsubmit="handlePublicRegister(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Negócio / Comerciante</label>
-                                <input type="text" id="reg-input-name" required placeholder="Ex: Loja da Maria" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Usuário / Login</label>
-                                <input type="text" id="reg-input-user" required placeholder="Ex: maria123" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Senha</label>
-                                <input type="password" id="reg-input-pass" required placeholder="••••••" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
-                            </div>
-                            <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Cadastrar e Entrar no Painel</button>
-                        </form>
-                    </div>
-                </section>
-
-                <!-- 4. SEÇÃO FAVORITOS -->
+                <!-- SEÇÃO: FAVORITOS -->
                 <section id="tab-favoritos" class="hidden space-y-6">
-                    <div>
-                        <h2 class="text-2xl font-black text-graphite">Meus Produtos Favoritos</h2>
-                        <p class="text-sm text-gray-500">Lista rápida dos itens que você salvou para conferir depois.</p>
-                    </div>
+                    <h3 class="text-2xl font-black text-graphite">Seus Produtos Favoritos ❤️</h3>
                     <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Injetado via JS -->
                     </div>
                 </section>
 
-                <!-- 5. PAINEL DO COMERCIANTE -->
-                <section id="tab-painel" class="hidden space-y-8">
-                    <!-- Header do Painel -->
-                    <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-14 h-14 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl font-bold shadow-md">
-                                <i class="fa-solid fa-shop"></i>
+                <!-- SEÇÃO: CADASTRO / LOGIN DO LOJISTA -->
+                <section id="tab-cadastro" class="hidden max-w-md mx-auto py-12">
+                    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl space-y-6">
+                        <div class="text-center space-y-2">
+                            <div class="w-12 h-12 rounded-2xl gradient-cet mx-auto flex items-center justify-center text-white font-bold text-2xl shadow-md">VB</div>
+                            <h3 class="text-xl font-black text-graphite">Área do Empreendedor VB-ON</h3>
+                            <p class="text-xs text-gray-500">Cadastre seu negócio para gerenciar produtos, estoque e finanças.</p>
+                        </div>
+                        <form onsubmit="handlePublicRegister(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Nome do Negócio</label>
+                                <input type="text" id="reg-input-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-verde-esmeralda focus:outline-none text-graphite">
                             </div>
                             <div>
-                                <h2 class="text-xl font-black text-graphite" id="merchant-welcome-name">Painel do Comerciante</h2>
-                                <p class="text-xs text-gray-500">Gerencie estoque, finanças e simule vendas.</p>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Usuário / Login</label>
+                                <input type="text" id="reg-input-user" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-verde-esmeralda focus:outline-none text-graphite">
                             </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Senha</label>
+                                <input type="password" id="reg-input-pass" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-verde-esmeralda focus:outline-none text-graphite">
+                            </div>
+                            <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Entrar / Cadastrar</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- SEÇÃO: PAINEL DO EMPREENDEDOR -->
+                <section id="tab-painel" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
+                        <div>
+                            <span class="text-xs font-bold text-verde-intenso uppercase tracking-wider">Painel Administrativo</span>
+                            <h3 id="merchant-welcome-name" class="text-xl font-black text-graphite">Painel do Lojista</h3>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="openProfileModal()" class="bg-slate-gray hover:bg-gray-200 text-graphite font-semibold px-4 py-2 rounded-xl text-xs transition-all"><i class="fa-solid fa-gear mr-1"></i> Configurações</button>
-                            <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2 rounded-xl text-xs transition-all"><i class="fa-solid fa-right-from-bracket mr-1"></i> Sair</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="openProfileModal()" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-4 py-2.5 rounded-xl transition-all"><i class="fa-solid fa-gear mr-1.5"></i> Configurações</button>
+                            <button onclick="openProductModal()" class="gradient-cet text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all"><i class="fa-solid fa-plus mr-1.5"></i> Novo Produto</button>
                         </div>
                     </div>
 
-                    <!-- Subtabs Nav -->
+                    <!-- Subtabs do Painel -->
                     <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
-                        <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-custom text-white shadow-sm transition-all">Meus Produtos & Estoque</button>
-                        <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Gestão Financeira & Gráficos</button>
-                        <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Registro de Vendas</button>
-                        <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Calculadora Comercial</button>
-                        <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Simulador de Negócios</button>
+                        <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn bg-verde-esmeralda text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all"><i class="fa-solid fa-box mr-1.5"></i> Meus Produtos & Estoque</button>
+                        <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-wallet mr-1.5"></i> Gestão Financeira</button>
+                        <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-cart-shopping mr-1.5"></i> Registro de Vendas</button>
+                        <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-calculator mr-1.5"></i> Calculadora Comercial</button>
+                        <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn bg-white text-graphite font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all"><i class="fa-solid fa-chart-line mr-1.5"></i> Simulador de Viabilidade</button>
                     </div>
 
-                    <!-- SUBTAB: PRODUTOS -->
+                    <!-- SUBTAB: PRODUTOS & ESTOQUE -->
                     <div id="subtab-produtos" class="space-y-6">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-bold text-graphite">Gerenciamento de Produtos</h3>
-                            <button onclick="openProductModal()" class="bg-emerald-custom text-white font-semibold px-5 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-xs">
-                                <i class="fa-solid fa-plus mr-1"></i> Cadastrar Produto
-                            </button>
-                        </div>
                         <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             <!-- Injetado via JS -->
                         </div>
                     </div>
 
-                    <!-- SUBTAB: FINANCEIRO -->
-                    <div id="subtab-financeiro" class="hidden space-y-8">
+                    <!-- SUBTAB: GESTÃO FINANCEIRA -->
+                    <div id="subtab-financeiro" class="hidden space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Geral</p>
-                                <h4 class="text-2xl font-extrabold text-tech-green" id="kpi-receita">R$ 0,00</h4>
+                                <h4 class="text-2xl font-extrabold text-verde-intenso" id="kpi-receita">R$ 0,00</h4>
                             </div>
                             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos Totais</p>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos</p>
                                 <h4 class="text-2xl font-extrabold text-amber-600" id="kpi-custos">R$ 0,00</h4>
                             </div>
-                            <div class="bg-white p-5 rounded-2xl border border-gray-border-gray-200 shadow-sm">
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas Operacionais</p>
                                 <h4 class="text-2xl font-extrabold text-rose-600" id="kpi-despesas">R$ 0,00</h4>
                             </div>
                             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro Líquido</p>
-                                <h4 class="text-2xl font-extrabold text-tech-green" id="kpi-lucro">R$ 0,00</h4>
+                                <h4 class="text-2xl font-extrabold text-verde-esmeralda" id="kpi-lucro">R$ 0,00</h4>
                             </div>
                             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Capital Inicial</p>
-                                <h4 class="text-2xl font-extrabold text-navy" id="kpi-capital">R$ 0,00</h4>
+                                <h4 class="text-2xl font-extrabold text-roxo-profundo" id="kpi-capital">R$ 0,00</h4>
                             </div>
                         </div>
 
-                        <!-- Charts -->
+                        <!-- Gráficos -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                                 <h4 class="font-bold text-graphite mb-4">Fluxo Financeiro (Receitas x Gastos)</h4>
@@ -291,11 +259,11 @@
                             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                                 <span class="font-bold text-graphite">Histórico de Lançamentos</span>
                                 <div class="flex gap-2">
-                                    <button onclick="openExpenseModal()" class="bg-emerald-custom text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:opacity-95"><i class="fa-solid fa-plus mr-1"></i> Novo Lançamento</button>
+                                    <button onclick="openExpenseModal()" class="gradient-cet text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:opacity-90"><i class="fa-solid fa-plus mr-1"></i> Novo Lançamento</button>
                                     <button onclick="exportFinancialPDF()" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-4 py-2 rounded-xl"><i class="fa-solid fa-download mr-1"></i> Exportar Relatório</button>
                                 </div>
                             </div>
-                            <div class="overflow-x-auto">
+                            <div class="overflow-x-auto"                            <div class="overflow-x-auto">
                                 <table class="w-full text-left text-sm">
                                     <thead class="bg-slate-gray text-gray-600 uppercase text-xs">
                                         <tr>
@@ -321,28 +289,28 @@
                             <form onsubmit="handleSaleSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Data da Venda</label>
-                                    <input type="date" id="sale-date" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="date" id="sale-date" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Produto</label>
-                                    <select id="sale-product" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <select id="sale-product" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                         <!-- Preenchido via JS -->
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Quantidade</label>
-                                    <input type="number" id="sale-qty" min="1" value="1" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" id="sale-qty" min="1" value="1" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Total Recebido (R$)</label>
-                                    <input type="number" step="0.01" id="sale-total" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" step="0.01" id="sale-total" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição / Cliente</label>
-                                    <input type="text" id="sale-desc" placeholder="Ex: Venda à vista para João" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="text" id="sale-desc" placeholder="Ex: Venda à vista para João" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div class="sm:col-span-2 flex items-end">
-                                    <button type="submit" class="w-full bg-emerald-custom text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">
+                                    <button type="submit" class="w-full gradient-cet text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">
                                         <i class="fa-solid fa-cart-plus mr-2"></i> Registrar Venda (Baixa Automática no Estoque)
                                     </button>
                                 </div>
@@ -384,7 +352,7 @@
                             <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
                                 <h3 class="text-lg font-bold text-graphite mb-4 text-center">Calculadora Comercial</h3>
                                 <div class="mb-4">
-                                    <input type="text" id="calc-screen" readonly class="w-full bg-navy text-white text-right text-3xl font-mono px-4 py-4 rounded-2xl shadow-inner tracking-wider" value="0">
+                                    <input type="text" id="calc-screen" readonly class="w-full bg-roxo-profundo text-white text-right text-3xl font-mono px-4 py-4 rounded-2xl shadow-inner tracking-wider" value="0">
                                 </div>
                                 <div class="grid grid-cols-4 gap-3">
                                     <button onclick="calcClear()" class="bg-rose-100 text-rose-700 font-bold py-3.5 rounded-xl hover:bg-rose-200 transition-all">C</button>
@@ -405,7 +373,7 @@
                                     <button onclick="calcAppend('1')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">1</button>
                                     <button onclick="calcAppend('2')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">2</button>
                                     <button onclick="calcAppend('3')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">3</button>
-                                    <button onclick="calcCompute()" class="row-span-2 bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all flex items-center justify-center">=</button>
+                                    <button onclick="calcCompute()" class="row-span-2 gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center">=</button>
 
                                     <button onclick="calcAppend('0')" class="col-span-2 bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">0</button>
                                     <button onclick="calcAppend('.')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">.</button>
@@ -432,34 +400,34 @@
                             <form onsubmit="handleSimulation(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Capital Disponível (R$)</label>
-                                    <input type="number" step="0.01" id="sim-capital" value="1000" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" step="0.01" id="sim-capital" value="1000" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Custo de Ingredientes/Matéria (R$)</label>
-                                    <input type="number" step="0.01" id="sim-custo-unit" value="5.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" step="0.01" id="sim-custo-unit" value="5.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Embalagens por Unidade (R$)</label>
-                                    <input type="number" step="0.01" id="sim-embalagem" value="1.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" step="0.01" id="sim-embalagem" value="1.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Despesas Fixas Adicionais (R$)</label>
-                                    <input type="number" step="0.01" id="sim-despesas" value="150.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" step="0.01" id="sim-despesas" value="150.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. que Pretende Produzir</label>
-                                    <input type="number" id="sim-qtd-produzir" value="200" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" id="sim-qtd-produzir" value="200" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Preço de Venda Unitário (R$)</label>
-                                    <input type="number" step="0.01" id="sim-preco-venda" value="15.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" step="0.01" id="sim-preco-venda" value="15.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. Estimada de Vendas</label>
-                                    <input type="number" id="sim-qtd-vendas" value="180" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <input type="number" id="sim-qtd-vendas" value="180" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                                 </div>
                                 <div class="flex items-end">
-                                    <button type="submit" class="w-full bg-emerald-custom text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">
+                                    <button type="submit" class="w-full gradient-cet text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">
                                         <i class="fa-solid fa-chart-line mr-2"></i> Simular Cenário
                                     </button>
                                 </div>
@@ -479,7 +447,7 @@
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Projetada</p>
-                                    <h4 class="text-2xl font-extrob -extrabold text-tech-green" id="res-receita">R$ 0,00</h4>
+                                    <h4 class="text-2xl font-extrabold text-verde-esmeralda" id="res-receita">R$ 0,00</h4>
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro / Prejuízo</p>
@@ -490,11 +458,11 @@
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Margem de Lucro</p>
-                                    <h4 class="text-xl font-extrabold text-emerald-custom" id="res-margem">0%</h4>
+                                    <h4 class="text-xl font-extrabold text-verde-esmeralda" id="res-margem">0%</h4>
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ponto de Equilíbrio (Break-even)</p>
-                                    <h4 class="text-xl font-extrabold text-navy" id="res-breakeven">0 unidades</h4>
+                                    <h4 class="text-xl font-extrabold text-roxo-profundo" id="res-breakeven">0 unidades</h4>
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Viabilidade</p>
@@ -516,7 +484,7 @@
 
             <!-- FOOTER -->
             <footer class="mt-16 py-6 text-center text-sm text-gray-500 border-t border-gray-200">
-                <p class="font-bold text-graphite">VB-ON — Várzea Branca, Piauí</p>
+                <p class="font-bold text-graphite">VB-ON — CETI José Marques • Várzea Branca, Piauí</p>
                 <p class="mt-1">Várzea branca on-fire 🔥 | Tecnologia • Empreendedorismo • Conexão</p>
             </footer>
         </main>
@@ -533,11 +501,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Produto</label>
-                        <input type="text" id="prod-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                        <input type="text" id="prod-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Categoria</label>
-                        <select id="prod-cat" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                        <select id="prod-cat" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                             <option value="Alimentação">Alimentação</option>
                             <option value="Vestuário">Vestuário</option>
                             <option value="Eletrônicos">Eletrônicos</option>
@@ -550,34 +518,34 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Preço (R$)</label>
-                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. em Estoque</label>
-                        <input type="number" id="prod-stock" min="0" value="10" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                        <input type="number" id="prod-stock" min="0" value="10" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Localização</label>
-                        <input type="text" id="prod-location" value="Várzea Branca - PI" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                        <input type="text" id="prod-location" value="Várzea Branca - PI" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Foto de Capa (Selecione do Dispositivo)</label>
-                    <input type="file" id="prod-img-file" accept="image/*" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-custom hover:file:bg-emerald-100 text-graphite">
+                    <input type="file" id="prod-img-file" accept="image/*" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-verde-intenso hover:file:bg-emerald-100 text-graphite">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Link do WhatsApp para Contato (com DDD)</label>
-                    <input type="text" id="prod-whatsapp" placeholder="Ex: 5589999999999" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp para Contato (com DDD, ex: 5589999999999)</label>
+                    <input type="text" id="prod-whatsapp" placeholder="5589999999999" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição Completa</label>
-                    <textarea id="prod-desc" rows="3" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite"></textarea>
+                    <textarea id="prod-desc" rows="3" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite"></textarea>
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Produto</button>
+                <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Salvar Produto</button>
             </form>
         </div>
     </div>
@@ -601,7 +569,7 @@
                     <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp Principal</label>
                     <input type="text" id="prof-whatsapp" placeholder="Ex: 5589999999999" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
                 </div>
-                <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Alterações</button>
+                <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Salvar Alterações</button>
             </form>
         </div>
     </div>
@@ -633,14 +601,14 @@
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Valor (R$)</label>
                     <input type="number" step="0.01" id="exp-val" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
                 </div>
-                <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Lançamento</button>
+                <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Salvar Lançamento</button>
             </form>
         </div>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        let db = JSON.parse(localStorage.getItem('conecta_vb_db_v6')) || {
+        let db = JSON.parse(localStorage.getItem('conecta_vb_db_v7')) || {
             currentUser: null,
             merchants: [
                 { user: 'adm', pass: '123', name: 'Comércio Exemplo VB', hours: 'Seg a Sáb, 08h às 18h', whatsapp: '5589999999999' }
@@ -657,16 +625,12 @@
                 { id: '2', user: 'adm', type: 'Custo', date: '2026-11-02', desc: 'Ingredientes para bolos', val: 150.00 },
                 { id: '3', user: 'adm', type: 'Despesa', date: '2026-11-05', desc: 'Embalagens e sacolas', val: 60.00 }
             ],
-            chatMessages: [
-                { id: '1', sender: 'Cliente', text: 'Olá! Gostaria de saber se tem o bolo de chocolate pronta entrega?', time: '10:15' },
-                { id: '2', sender: 'Vendedor', text: 'Olá! Sim, temos duas unidades fresquinhas disponíveis hoje!', time: '10:18' }
-            ],
             favorites: [],
             calcHistory: []
         };
 
         function saveDB() {
-            localStorage.setItem('conecta_vb_db_v6', JSON.stringify(db));
+            localStorage.setItem('conecta_vb_db_v7', JSON.stringify(db));
         }
 
         function showToast(msg) {
@@ -678,24 +642,49 @@
             }, 3000);
         }
 
+        // --- SIDEBAR TOGGLE ---
+        let isSidebarCollapsed = false;
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const texts = document.querySelectorAll('.sidebar-text');
+            const icon = document.getElementById('sidebar-toggle-icon');
+            const brand = document.getElementById('sidebar-brand');
+
+            isSidebarCollapsed = !isSidebarCollapsed;
+            if(isSidebarCollapsed) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                texts.forEach(t => t.classList.add('hidden'));
+                brand.classList.add('hidden');
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                texts.forEach(t => t.classList.remove('hidden'));
+                brand.classList.remove('hidden');
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        }
+
         // --- NAVIGATION TABS ---
         function switchTab(tabId) {
-            document.querySelectorAll('main > .max-w-6xl > section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('main > .max-w-7xl > section').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-white/10', 'text-emerald-custom');
+                btn.classList.remove('bg-white/10', 'text-verde-limao');
                 btn.classList.add('text-white/80');
             });
             const activeBtn = document.getElementById('nav-btn-' + tabId);
             if(activeBtn) {
-                activeBtn.classList.add('bg-white/10', 'text-emerald-custom');
+                activeBtn.classList.add('bg-white/10', 'text-verde-limao');
                 activeBtn.classList.remove('text-white/80');
             }
 
             if(tabId === 'inicio') renderCatalog();
             if(tabId === 'favoritos') renderFavorites();
-            if(tabId === 'chat') renderChat();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -704,11 +693,11 @@
             document.getElementById('subtab-' + subId).classList.remove('hidden');
 
             document.querySelectorAll('.subtab-btn').forEach(btn => {
-                btn.classList.remove('bg-emerald-custom', 'text-white', 'shadow-sm');
+                btn.classList.remove('bg-verde-esmeralda', 'text-white', 'shadow-sm');
                 btn.classList.add('bg-white', 'text-graphite');
             });
             const activeBtn = document.getElementById('subtab-btn-' + subId);
-            activeBtn.classList.add('bg-emerald-custom', 'text-white', 'shadow-sm');
+            activeBtn.classList.add('bg-verde-esmeralda', 'text-white', 'shadow-sm');
             activeBtn.classList.remove('bg-white', 'text-graphite');
 
             if(subId === 'produtos') renderMerchantProducts();
@@ -717,89 +706,17 @@
             if(subId === 'calculadora') renderCalcHistory();
         }
 
-        // --- CHAT SYSTEM INTEGRADO ---
-        function openChatWithProduct(productName) {
-            switchTab('chat');
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            db.chatMessages.push({
-                id: Date.now().toString(),
-                sender: 'Cliente',
-                text: `Olá! Tenho interesse no produto: *${productName}* visto no catálogo do VB-ON. Está disponível?`,
-                time: timeStr
-            });
-            saveDB();
-            renderChat();
-            showToast('Chat aberto com mensagem sobre o produto!');
-        }
-
-        function switchChatSender() {
-            renderChat();
-        }
-
-        function handleChatSubmit(e) {
-            e.preventDefault();
-            const input = document.getElementById('chat-input-msg');
-            const senderRole = document.getElementById('chat-sender-role').value;
-            const text = input.value.trim();
-            if(!text) return;
-
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            db.chatMessages.push({
-                id: Date.now().toString(),
-                sender: senderRole,
-                text: text,
-                time: timeStr
-            });
-
-            saveDB();
-            input.value = '';
-            renderChat();
-        }
-
-        function deleteChatMessage(msgId) {
-            db.chatMessages = db.chatMessages.filter(m => m.id !== msgId);
-            saveDB();
-            renderChat();
-            showToast('Mensagem apagada.');
-        }
-
-        function renderChat() {
-            const container = document.getElementById('chat-messages-container');
-            const currentRole = document.getElementById('chat-sender-role').value;
-
-            if(db.chatMessages.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-400 py-12"><i class="fa-regular fa-comment-dots text-3xl mb-2"></i><p>Nenhuma mensagem no chat ainda. Comece a conversar!</p></div>`;
-                return;
-            }
-
-            container.innerHTML = db.chatMessages.map(m => {
-                const isMe = m.sender === currentRole;
-                return `
-                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2">
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="text-xs font-bold ${isMe ? 'text-emerald-custom' : 'text-navy'}">${m.sender}</span>
-                            <span class="text-[10px] text-gray-400">${m.time}</span>
-                        </div>
-                        <div class="relative group max-w-md px-4 py-3 rounded-2xl text-sm shadow-sm ${isMe ? 'bg-emerald-custom text-white rounded-tr-none' : 'bg-white text-graphite border border-gray-200 rounded-tl-none'}">
-                            <p>${m.text}</p>
-                            <button onclick="deleteChatMessage('${m.id}')" class="absolute -top-2 -right-2 bg-rose-600 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow" title="Apagar mensagem">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            container.scrollTop = container.scrollHeight;
+        // --- WHATSAPP DIRECT INTEGRATION ---
+        function openWhatsAppChat(phone, productName) {
+            const cleanPhone = phone.replace(/\D/g, '');
+            const message = encodeURIComponent(`Olá! Vi o produto *${productName}* no catálogo do VB-ON (CETI José Marques) e tenho interesse. Está disponível?`);
+            window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
         }
 
         // --- AUTH & PUBLIC REGISTER ---
         function checkAdminAccess() {
             if(!db.currentUser) {
-                itchTab('cadastro');
+                switchTab('cadastro');
                 showToast('Cadastre-se ou acesse com uma conta para gerenciar.');
             } else {
                 switchTab('painel');
@@ -853,7 +770,7 @@
         }
 
         function shareProduct(name, price) {
-            const text = `Confira este produto incrível em Várzea Branca–PI: *${name}* por apenas R$ ${price.toFixed(2)} no VB-ON!`;
+            const text = `Confira este produto incrível em Várzea Branca–PI (CETI José Marques): *${name}* por apenas R$ ${price.toFixed(2)} no VB-ON!`;
             if(navigator.share) {
                 navigator.share({ title: 'VB-ON', text: text, url: window.location.href }).catch(() => {});
             } else {
@@ -904,7 +821,7 @@
                                 <h3 class="font-black text-graphite text-base line-clamp-1">${p.name}</h3>
                                 <p class="text-graphite text-xs line-clamp-2 leading-relaxed">${p.desc}</p>
                                 <div class="flex items-center justify-between text-xs text-gray-500 pt-1">
-                                    <span><i class="fa-solid fa-location-dot mr-1 text-emerald-custom"></i> ${p.location}</span>
+                                    <span><i class="fa-solid fa-location-dot mr-1 text-verde-esmeralda"></i> ${p.location}</span>
                                     <span class="${p.stock <= 3 && p.stock > 0 ? 'text-amber-600 font-bold' : ''}">Estoque: ${p.stock}</span>
                                 </div>
                             </div>
@@ -912,14 +829,14 @@
                             <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                                 <div>
                                     <span class="text-[10px] uppercase font-bold text-gray-400 block">Preço</span>
-                                    <span class="font-extrabold text-emerald-custom text-xl">R$ ${p.price.toFixed(2)}</span>
+                                    <span class="font-extrabold text-verde-intenso text-xl">R$ ${p.price.toFixed(2)}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <button onclick="shareProduct('${p.name}', ${p.price})" class="w-10 h-10 rounded-xl bg-slate-gray hover:bg-gray-200 text-graphite flex items-center justify-center text-xs transition-all" title="Compartilhar">
                                         <i class="fa-solid fa-share-nodes"></i>
                                     </button>
-                                    <button onclick="openChatWithProduct('${p.name}')" class="bg-emerald-custom text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all flex items-center gap-2">
-                                        <i class="fa-solid fa-comments"></i> Abrir Chat
+                                    <button onclick="openWhatsAppChat('${p.whatsapp || '5589999999999'}', '${p.name}')" class="gradient-cet text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all flex items-center gap-2">
+                                        <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
                                     </button>
                                 </div>
                             </div>
@@ -945,11 +862,11 @@
                     </button>
                     <div>
                         <h3 class="font-bold text-graphite text-base">${p.name}</h3>
-                        <span class="font-extrabold text-emerald-custom text-lg">R$ ${p.price.toFixed(2)}</span>
+                        <span class="font-extrabold text-verde-intenso text-lg">R$ ${p.price.toFixed(2)}</span>
                         <p class="text-graphite text-sm line-clamp-2 mt-2">${p.desc}</p>
                     </div>
-                    <button onclick="openChatWithProduct('${p.name}')" class="w-full bg-emerald-custom text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95">
-                        <i class="fa-solid fa-comments"></i> Abrir Chat sobre o Produto
+                    <button onclick="openWhatsAppChat('${p.whatsapp || '5589999999999'}', '${p.name}')" class="w-full gradient-cet text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-90">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Negociar no WhatsApp
                     </button>
                 </div>
             `).join('');
@@ -991,13 +908,13 @@
                             <span class="bg-slate-gray text-xs font-bold px-2 py-0.5 rounded-md text-graphite">${p.cat}</span>
                         </div>
                         <div class="flex justify-between items-center mt-2">
-                            <span class="text-emerald-custom font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
+                            <span class="text-verde-intenso font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
                             <span class="text-xs px-2 py-0.5 rounded-md font-bold ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-slate-gray text-graphite'}">Estoque: ${p.stock} un.</span>
                         </div>
                         <p class="text-graphite text-xs line-clamp-2 mt-2">${p.desc}</p>
                     </div>
                     <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
-                        <button onclick="editProduct('${p.id}')" class="bg-slate-gray hover:bg-gray-200 text-navy text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
+                        <button onclick="editProduct('${p.id}')" class="bg-slate-gray hover:bg-gray-200 text-roxo-profundo text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
                         <button onclick="deleteProduct('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash mr-1"></i> Excluir</button>
                     </div>
                 </div>
@@ -1010,6 +927,9 @@
         function openProductModal(editId = null) {
             document.getElementById('product-modal').classList.remove('hidden');
             currentImageBase64 = '';
+            const merchantObj = db.merchants.find(m => m.user === db.currentUser);
+            const defaultWhatsapp = merchantObj ? merchantObj.whatsapp : '5589999999999';
+
             if(editId) {
                 document.getElementById('product-modal-title').innerText = 'Editar Produto & Estoque';
                 const p = db.products.find(item => item.id === editId);
@@ -1019,7 +939,7 @@
                 document.getElementById('prod-price').value = p.price;
                 document.getElementById('prod-stock').value = p.stock;
                 document.getElementById('prod-location').value = p.location;
-                document.getElementById('prod-whatsapp').value = p.whatsapp;
+                document.getElementById('prod-whatsapp').value = p.whatsapp || defaultWhatsapp;
                 document.getElementById('prod-desc').value = p.desc;
                 currentImageBase64 = p.img;
             } else {
@@ -1028,7 +948,7 @@
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-stock').value = '10';
-                document.getElementById('prod-whatsapp').value = '';
+                document.getElementById('prod-whatsapp').value = defaultWhatsapp;
                 document.getElementById('prod-desc').value = '';
                 document.getElementById('prod-img-file').value = '';
             }
@@ -1136,7 +1056,7 @@
             const totalDespesas = myExpenses.filter(e => e.type === 'Despesa').reduce((acc, e) => acc + e.val, 0);
             const lucro = totalReceita - (totalCustos + totalDespesas);
 
-            let content = `VB-ON - RELATÓRIO FINANCEIRO\n====================================\n\n`;
+            let content = `VB-ON - RELATÓRIO FINANCEIRO (CETI José Marques)\n====================================\n\n`;
             content += `Receita Geral: R$ ${totalReceita.toFixed(2)}\n`;
             content += `Custos: R$ ${totalCustos.toFixed(2)}\n`;
             content += `Despesas: R$ ${totalDespesas.toFixed(2)}\n`;
@@ -1170,7 +1090,7 @@
             document.getElementById('kpi-despesas').innerText = `R$ ${totalDespesas.toFixed(2)}`;
             const kpiLucro = document.getElementById('kpi-lucro');
             kpiLucro.innerText = `R$ ${lucroLiquido.toFixed(2)}`;
-            kpiLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-tech-green' : 'text-rose-600'}`;
+            kpiLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-verde-esmeralda' : 'text-rose-600'}`;
             document.getElementById('kpi-capital').innerText = `R$ ${totalCapital.toFixed(2)}`;
 
             const tbody = document.getElementById('expenses-table-body');
@@ -1187,9 +1107,9 @@
             tbody.innerHTML = allItems.map(item => `
                 <tr class="hover:bg-slate-gray">
                     <td class="px-6 py-3 font-medium text-graphite">${item.date}</td>
-                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.isSale ? 'bg-slate-gray text-emerald-custom' : 'bg-amber-50 text-amber-700'}">${item.type}</span></td>
+                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.isSale ? 'bg-slate-gray text-verde-intenso' : 'bg-amber-50 text-amber-700'}">${item.type}</span></td>
                     <td class="px-6 py-3 text-graphite">${item.desc}</td>
-                    <td class="px-6 py-3 font-bold ${item.isSale ? 'text-tech-green' : 'text-rose-600'}">${item.isSale ? '+' : '-'} R$ ${item.val.toFixed(2)}</td>
+                    <td class="px-6 py-3 font-bold ${item.isSale ? 'text-verde-intenso' : 'text-rose-600'}">${item.isSale ? '+' : '-'} R$ ${item.val.toFixed(2)}</td>
                     <td class="px-6 py-3 text-right">
                         ${!item.isSale ? `<button onclick="deleteExpense('${item.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
@@ -1217,7 +1137,7 @@
                     datasets: [{
                         label: 'Valores em R$',
                         data: [totalReceita, totalCustos, totalDespesas],
-                        backgroundColor: ['#20C997', '#d97706', '#e11d48'],
+                        backgroundColor: ['#20C957', '#d97706', '#e11d48'],
                         borderRadius: 12
                     }]
                 },
@@ -1245,7 +1165,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { position: 'bottom' } }
-                }
+                   }
             });
         }
 
@@ -1305,7 +1225,7 @@
                     <td class="px-6 py-3 font-medium text-graphite">${s.date}</td>
                     <td class="px-6 py-3 text-graphite font-semibold">${s.product}</td>
                     <td class="px-6 py-3 text-graphite">${s.qty}</td>
-                    <td class="px-6 py-3 font-bold text-tech-green">R$ ${s.total.toFixed(2)}</td>
+                    <td class="px-6 py-3 font-bold text-verde-intenso">R$ ${s.total.toFixed(2)}</td>
                     <td class="px-6 py-3 text-gray-500">${s.desc || '-'}</td>
                     <td class="px-6 py-3 text-right">
                         <button onclick="deleteSale('${s.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
@@ -1391,7 +1311,7 @@
             
             const resLucro = document.getElementById('res-lucro');
             resLucro.innerText = `R$ ${lucroLiquido.toFixed(2)}`;
-            resLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-tech-green' : 'text-rose-600'}`;
+            resLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-verde-esmeralda' : 'text-rose-600'}`;
 
             document.getElementById('res-margem').innerText = `${margemLucro.toFixed(1)}%`;
             document.getElementById('res-breakeven').innerText = `${breakEven} unidades`;
@@ -1399,7 +1319,7 @@
             const resStatus = document.getElementById('res-status');
             if(lucroLiquido > 0) {
                 resStatus.innerText = 'Altamente Viável';
-                resStatus.className = 'text-xl font-extrabold text-tech-green';
+                resStatus.className = 'text-xl font-extrabold text-verde-esmeralda';
             } else {
                 resStatus.innerText = 'Ajustar Preços / Custos';
                 resStatus.className = 'text-xl font-extrabold text-rose-600';
@@ -1416,14 +1336,14 @@
 
             document.getElementById('scenarios-grid').innerHTML = `
                 <div class="bg-slate-gray p-4 rounded-xl border border-gray-200">
-                    <h5 class="font-bold text-navy mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Otimista (+20%)</h5>
+                    <h5 class="font-bold text-roxo-profundo mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Otimista (+20%)</h5>
                     <p class="text-xs text-graphite">Vendas: ${otimistaQtd} un.</p>
-                    <p class="text-sm font-extrabold text-emerald-custom mt-2">Lucro: R$ ${otimistaLucro.toFixed(2)}</p>
+                    <p class="text-sm font-extrabold text-verde-intenso mt-2">Lucro: R$ ${otimistaLucro.toFixed(2)}</p>
                 </div>
                 <div class="bg-slate-gray p-4 rounded-xl border border-gray-200">
-                    <h5 class="font-bold text-navy mb-1"><i class="fa-solid fa-scale-balanced mr-1"></i> Moderado (Esperado)</h5>
+                    <h5 class="font-bold text-roxo-profundo mb-1"><i class="fa-solid fa-scale-balanced mr-1"></i> Moderado (Esperado)</h5>
                     <p class="text-xs text-graphite">Vendas: ${moderadoQtd} un.</p>
-                    <p class="text-sm font-extrabold text-tech-green mt-2">Lucro: R$ ${moderadoLucro.toFixed(2)}</p>
+                    <p class="text-sm font-extrabold text-verde-esmeralda mt-2">Lucro: R$ ${moderadoLucro.toFixed(2)}</p>
                 </div>
                 <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
                     <h5 class="font-bold text-amber-800 mb-1"><i class="fa-solid fa-arrow-trend-down mr-1"></i> Conservador (-20%)</h5>
