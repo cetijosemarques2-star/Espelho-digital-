@@ -37,10 +37,11 @@
         <!-- SIDEBAR (MENU LATERAL ESQUERDO) -->
         <aside class="w-full md:w-72 bg-navy text-white flex flex-col justify-between p-6 shadow-xl z-30 shrink-0">
             <div>
-                <!-- Logo & Nome -->
-                <div class="flex items-center space-x-3 mb-10 cursor-pointer" onclick="switchTab('inicio')">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-custom flex items-center justify-center text-white text-xl font-black shadow-md">
-                        VB
+                <!-- Logo & Nome (Lê logo.png com fallback) -->
+                <div class="flex items-center space-x-3 mb-8 cursor-pointer" onclick="switchTab('inicio')">
+                    <div id="logo-container" class="w-12 h-12 rounded-2xl bg-emerald-custom flex items-center justify-center text-white text-xl font-black shadow-md overflow-hidden">
+                        <img src="logo.png" alt="VB" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
+                        <span id="logo-fallback" class="hidden w-full h-full items-center justify-center bg-emerald-custom text-white">VB</span>
                     </div>
                     <div>
                         <h1 class="font-black text-xl tracking-tight text-white">VB<span class="text-tech-green">-ON</span></h1>
@@ -48,11 +49,15 @@
                     </div>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Navigation Links Organizados -->
                 <nav class="space-y-2">
                     <button onclick="switchTab('inicio')" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-emerald-custom bg-white/10 transition-all text-left">
                         <i class="fa-solid fa-house w-5"></i>
                         <span>Início & Catálogo</span>
+                    </button>
+                    <button onclick="switchTab('chat')" id="nav-btn-chat" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
+                        <i class="fa-solid fa-comments w-5"></i>
+                        <span>Chat Cliente / Vendedor</span>
                     </button>
                     <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
                         <i class="fa-solid fa-user-plus w-5"></i>
@@ -85,24 +90,11 @@
 
                 <!-- 1. SEÇÃO INÍCIO & CATÁLOGO -->
                 <section id="tab-inicio" class="space-y-8">
-                    <!-- Hero Banner com as Ilustrações 3D -->
-                    <div class="relative rounded-3xl bg-navy text-white p-8 sm:p-12 overflow-hidden shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8">
-                        <div class="relative z-10 max-w-xl space-y-6">
-                            <span class="bg-emerald-custom/20 text-tech-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Várzea branca on-fire 🔥</span>
-                            <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">TECNOLOGIA • EMPREENDEDORISMO • CONEXÃO</h2>
-                            <p class="text-slate-gray text-sm sm:text-base leading-relaxed">Divulgue seus produtos, conecte-se com clientes pelo WhatsApp, gerencie suas finanças e simule o crescimento do seu empreendimento em um só lugar.</p>
-                        </div>
-                        <!-- Imagem 3D incorporada no Banner -->
-                        <div class="relative z-10 shrink-0 grid grid-cols-2 gap-4 max-w-xs">
-                            <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10 text-center shadow-lg">
-                                <img src="https://images.unsplash.com/photo-1556742049-0a67d55362ec?auto=format&fit=crop&w=300&q=80" alt="Comércio local" class="w-full h-24 object-cover rounded-xl mb-2">
-                                <span class="text-xs font-bold text-tech-green">Comércio Local</span>
-                            </div>
-                            <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10 text-center shadow-lg">
-                                <img src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=300&q=80" alt="Gestão Financeira" class="w-full h-24 object-cover rounded-xl mb-2">
-                                <span class="text-xs font-bold text-tech-green">Gestão Financeira</span>
-                            </div>
-                        </div>
+                    <!-- Hero Banner Compacto e Otimizado para Celular -->
+                    <div class="relative rounded-3xl bg-navy text-white p-6 sm:p-8 overflow-hidden shadow-xl space-y-4">
+                        <span class="bg-emerald-custom/20 text-tech-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Várzea branca on-fire 🔥</span>
+                        <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">TECNOLOGIA • EMPREENDEDORISMO • CONEXÃO</h2>
+                        <p class="text-slate-gray text-xs sm:text-sm leading-relaxed max-w-2xl">Divulgue seus produtos, conecte-se com clientes, gerencie suas finanças e simule o crescimento do seu empreendimento em um só lugar.</p>
                     </div>
 
                     <!-- Filtros e Busca do Catálogo -->
@@ -131,13 +123,52 @@
                         </div>
                     </div>
 
-                    <!-- Grid de Produtos (Lado a lado, preenchendo o espaço) -->
+                    <!-- Grid de Produtos -->
                     <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Injetado via JS -->
                     </div>
                 </section>
 
-                <!-- 2. SEÇÃO CADASTRO NA PLATAFORMA -->
+                <!-- 2. SEÇÃO CHAT CLIENTE / VENDEDOR -->
+                <section id="tab-chat" class="hidden space-y-6">
+                    <div class="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden flex flex-col h-[650px]">
+                        <!-- Chat Header -->
+                        <div class="bg-navy text-white p-4 sm:p-6 flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-emerald-custom flex items-center justify-center font-bold text-white">
+                                    <i class="fa-solid fa-comments"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-base">Chat VB-ON (Negociação Direta)</h3>
+                                    <p class="text-xs text-tech-green">Converse com clientes e comerciantes</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="chat-sender-role" onchange="switchChatSender()" class="bg-white/10 border border-white/20 text-white rounded-xl px-3 py-1.5 text-xs focus:outline-none">
+                                    <option value="Cliente" class="text-graphite">Entrar como Cliente</option>
+                                    <option value="Vendedor" class="text-graphite">Entrar como Vendedor</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Body -->
+                        <div id="chat-messages-container" class="flex-grow p-4 sm:p-6 overflow-y-auto space-y-4 bg-slate-gray/50">
+                            <!-- Injetado via JS -->
+                        </div>
+
+                        <!-- Chat Input Footer -->
+                        <div class="p-4 bg-white border-t border-gray-200">
+                            <form onsubmit="handleChatSubmit(event)" class="flex gap-2">
+                                <input type="text" id="chat-input-msg" required placeholder="Digite sua mensagem de negociação..." class="flex-grow bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                <button type="submit" class="bg-emerald-custom text-white font-bold px-6 py-3 rounded-xl shadow-md hover:opacity-95 transition-all text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i> Enviar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. SEÇÃO CADASTRO NA PLATAFORMA -->
                 <section id="tab-cadastro" class="hidden space-y-6 max-w-xl mx-auto">
                     <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl">
                         <div class="text-center mb-6">
@@ -166,7 +197,7 @@
                     </div>
                 </section>
 
-                <!-- 3. SEÇÃO FAVORITOS -->
+                <!-- 4. SEÇÃO FAVORITOS -->
                 <section id="tab-favoritos" class="hidden space-y-6">
                     <div>
                         <h2 class="text-2xl font-black text-graphite">Meus Produtos Favoritos</h2>
@@ -177,7 +208,7 @@
                     </div>
                 </section>
 
-                <!-- 4. PAINEL DO COMERCIANTE -->
+                <!-- 5. PAINEL DO COMERCIANTE -->
                 <section id="tab-painel" class="hidden space-y-8">
                     <!-- Header do Painel -->
                     <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -448,7 +479,7 @@
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Projetada</p>
-                                    <h4 class="text-2xl font-extrabold text-tech-green" id="res-receita">R$ 0,00</h4>
+                                    <h4 class="text-2xl font-extrolt text-tech-green" id="res-receita">R$ 0,00</h4>
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro / Prejuízo</p>
@@ -476,7 +507,6 @@
                                 <h4 class="text-base font-bold text-graphite mb-4">Análise Comparativa de Cenários</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="scenarios-grid">
                                     <!-- Injetado via JS -->
-                                </div>
                                 </div>
                             </div>
                         </div>
@@ -610,7 +640,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        let db = JSON.parse(localStorage.getItem('conecta_vb_db_v5')) || {
+        let db = JSON.parse(localStorage.getItem('conecta_vb_db_v6')) || {
             currentUser: null,
             merchants: [
                 { user: 'adm', pass: '123', name: 'Comércio Exemplo VB', hours: 'Seg a Sáb, 08h às 18h', whatsapp: '5589999999999' }
@@ -627,12 +657,16 @@
                 { id: '2', user: 'adm', type: 'Custo', date: '2026-11-02', desc: 'Ingredientes para bolos', val: 150.00 },
                 { id: '3', user: 'adm', type: 'Despesa', date: '2026-11-05', desc: 'Embalagens e sacolas', val: 60.00 }
             ],
+            chatMessages: [
+                { id: '1', sender: 'Cliente', text: 'Olá! Gostaria de saber se tem o bolo de chocolate pronta entrega?', time: '10:15' },
+                { id: '2', sender: 'Vendedor', text: 'Olá! Sim, temos duas unidades fresquinhas disponíveis hoje!', time: '10:18' }
+            ],
             favorites: [],
             calcHistory: []
         };
 
         function saveDB() {
-            localStorage.setItem('conecta_vb_db_v5', JSON.stringify(db));
+            localStorage.setItem('conecta_vb_db_v6', JSON.stringify(db));
         }
 
         function showToast(msg) {
@@ -661,6 +695,7 @@
 
             if(tabId === 'inicio') renderCatalog();
             if(tabId === 'favoritos') renderFavorites();
+            if(tabId === 'chat') renderChat();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -682,6 +717,69 @@
             if(subId === 'calculadora') renderCalcHistory();
         }
 
+        // --- CHAT SYSTEM ---
+        function switchChatSender() {
+            renderChat();
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input-msg');
+            const senderRole = document.getElementById('chat-sender-role').value;
+            const text = input.value.trim();
+            if(!text) return;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            db.chatMessages.push({
+                id: Date.now().toString(),
+                sender: senderRole,
+                text: text,
+                time: timeStr
+            });
+
+            saveDB();
+            input.value = '';
+            renderChat();
+        }
+
+        function deleteChatMessage(msgId) {
+            db.chatMessages = db.chatMessages.filter(m => m.id !== msgId);
+            saveDB();
+            renderChat();
+            showToast('Mensagem apagada.');
+        }
+
+        function renderChat() {
+            const container = document.getElementById('chat-messages-container');
+            const currentRole = document.getElementById('chat-sender-role').value;
+
+            if(db.chatMessages.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-400 py-12"><i class="fa-regular fa-comment-dots text-3xl mb-2"></i><p>Nenhuma mensagem no chat ainda. Comece a conversar!</p></div>`;
+                return;
+            }
+
+            container.innerHTML = db.chatMessages.map(m => {
+                const isMe = m.sender === currentRole;
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="text-xs font-bold ${isMe ? 'text-emerald-custom' : 'text-navy'}">${m.sender}</span>
+                            <span class="text-[10px] text-gray-400">${m.time}</span>
+                        </div>
+                        <div class="relative group max-w-md px-4 py-3 rounded-2xl text-sm shadow-sm ${isMe ? 'bg-emerald-custom text-white rounded-tr-none' : 'bg-white text-graphite border border-gray-200 rounded-tl-none'}">
+                            <p>${m.text}</p>
+                            <button onclick="deleteChatMessage('${m.id}')" class="absolute -top-2 -right-2 bg-rose-600 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow" title="Apagar mensagem">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
         // --- AUTH & PUBLIC REGISTER ---
         function checkAdminAccess() {
             if(!db.currentUser) {
@@ -700,7 +798,7 @@
             const pass = document.getElementById('reg-input-pass').value.trim();
 
             if(db.merchants.some(m => m.user === user)) {
-                alert('Este usuário já existe. Escolha outro.');
+                alert('Este usuário já existe.  Escolha outro.');
                 return;
             }
 
@@ -777,11 +875,6 @@
                         <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-rose-500 shadow-md hover:scale-105 transition-all">
                             <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
                         </button>
-                        <div class="h-48 bg-slate-gray overflow-hidden relative">
-                            <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover">
-                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-bold px-3 py-1 rounded-full text-graphite">${p.cat}</span>
-                            ${isOut ? '<span class="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold uppercase tracking-wider text-sm">Esgotado</span>' : ''}
-                        </div>
                         <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
                             <div>
                                 <div class="flex justify-between items-start mb-1">
@@ -792,10 +885,11 @@
                                     <span><i class="fa-solid fa-location-dot mr-1 text-emerald-custom"></i> ${p.location}</span>
                                     <span class="${p.stock <= 3 && p.stock > 0 ? 'text-amber-600 font-bold' : ''}">Estoque: ${p.stock}</span>
                                 </div>
+                                <span class="inline-block bg-slate-gray text-xs font-bold px-2.5 py-1 rounded-full text-graphite mb-2">${p.cat}</span>
                                 <p class="text-graphite text-sm line-clamp-2">${p.desc}</p>
                             </div>
                             <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                                <button onclick="shareProduct('${p.name}', ${p.price})" class="text-gray-500 hover:text--emerald-custom text-xs font-semibold flex items-center gap-1" title="Compartilhar">
+                                <button onclick="shareProduct('${p.name}', ${p.price})" class="text-gray-500 hover:text-emerald-custom text-xs font-semibold flex items-center gap-1" title="Compartilhar">
                                     <i class="fa-solid fa-share-nodes"></i> Compartilhar
                                 </button>
                                 <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="bg-emerald-custom text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 hover:opacity-95">
@@ -818,23 +912,18 @@
             }
 
             grid.innerHTML = favProducts.map(p => `
-                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col relative">
-                    <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-rose-500 shadow-md">
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col relative p-5 justify-between space-y-4">
+                    <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-slate-gray flex items-center justify-center text-rose-500 shadow-sm">
                         <i class="fa-solid fa-heart text-lg"></i>
                     </button>
-                    <div class="h-48 bg-slate-gray overflow-hidden">
-                        <img src="${p.img}" class="w-full h-full object-cover">
+                    <div>
+                        <h3 class="font-bold text-graphite text-base">${p.name}</h3>
+                        <span class="font-extrabold text-emerald-custom text-lg">R$ ${p.price.toFixed(2)}</span>
+                        <p class="text-graphite text-sm line-clamp-2 mt-2">${p.desc}</p>
                     </div>
-                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
-                        <div>
-                            <h3 class="font-bold text-graphite text-base">${p.name}</h3>
-                            <span class="font-extrabold text-emerald-custom text-lg">R$ ${p.price.toFixed(2)}</span>
-                            <p class="text-graphite text-sm line-clamp-2 mt-2">${p.desc}</p>
-                        </div>
-                        <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="w-full bg-emerald-custom text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95">
-                            <i class="fa-brands fa-whatsapp text-sm"></i> Contatar pelo WhatsApp
-                        </a>
-                    </div>
+                    <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="w-full bg-emerald-custom text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Contatar pelo WhatsApp
+                    </a>
                 </div>
             `).join('');
         }
@@ -868,24 +957,21 @@
             }
 
             grid.innerHTML = myProducts.map(p => `
-                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
-                    <div class="h-40 bg-slate-gray relative">
-                        <img src="${p.img}" class="w-full h-full object-cover">
-                        <span class="absolute top-3 left-3 bg-white/90 text-xs font-bold px-2.5 py-1 rounded-full text-graphite">${p.cat}</span>
-                    </div>
-                    <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
-                        <div>
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col p-5 justify-between space-y-3">
+                    <div>
+                        <div class="flex justify-between items-start">
                             <h4 class="font-bold text-graphite">${p.name}</h4>
-                            <div class="flex justify-between items-center mt-1">
-                                <span class="text-emerald-custom font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
-                                <span class="text-xs px-2 py-0.5 rounded-md font-bold ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-slate-gray text-graphite'}">Estoque: ${p.stock} un.</span>
-                            </div>
-                            <p class="text-graphite text-xs line-clamp-2 mt-1">${p.desc}</p>
+                            <span class="bg-slate-gray text-xs font-bold px-2 py-0.5 rounded-md text-graphite">${p.cat}</span>
                         </div>
-                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
-                            <button onclick="editProduct('${p.id}')" class="bg-slate-gray hover:bg-gray-200 text-navy text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
-                            <button onclick="deleteProduct('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash mr-1"></i> Excluir</button>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-emerald-custom font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
+                            <span class="text-xs px-2 py-0.5 rounded-md font-bold ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-slate-gray text-graphite'}">Estoque: ${p.stock} un.</span>
                         </div>
+                        <p class="text-graphite text-xs line-clamp-2 mt-2">${p.desc}</p>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                        <button onclick="editProduct('${p.id}')" class="bg-slate-gray hover:bg-gray-200 text-navy text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
+                        <button onclick="deleteProduct('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash mr-1"></i> Excluir</button>
                     </div>
                 </div>
             `).join('');
@@ -933,7 +1019,7 @@
             const location = document.getElementById('prod-location').value;
             const whatsapp = document.getElementById('prod-whatsapp').value;
             const desc = document.getElementById('prod-desc').value;
-            const img = currentImageBase64 || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
+            const img = currentImageBase64 || '';
 
             if(editId) {
                 const p = db.products.find(item => item.id === editId);
