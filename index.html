@@ -3,550 +3,1315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espelho Digital - Maratona Tech 2026</title>
+    <title>VB-ON — Várzea Branca, Piauí</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para o Painel Financeiro -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* --- ESTILOS GERAIS & TEMA --- */
-        :root {
-            --bg-dark: #0F172A;
-            --card-bg: #1E293B;
-            --accent-purple: #7C3AED;
-            --accent-blue: #2563EB;
-            --success-green: #10B981;
-            --alert-red: #EF4444;
-            --text-light: #F8FAFC;
-            --text-muted: #94A3B8;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* --- CONTAINER DO SMARTPHONE / APP --- */
-        .app-container {
-            width: 100%;
-            max-width: 420px;
-            background-color: #0b1120;
-            border: 2px solid #334155;
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            min-height: 680px;
-        }
-
-        /* --- CABEÇALHO DA INTERFACE --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #334155;
-            margin-bottom: 20px;
-        }
-
-        .logo {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent-purple);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stats {
-            display: flex;
-            gap: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .stat-item {
-            background: var(--card-bg);
-            padding: 4px 8px;
-            border-radius: 12px;
-            border: 1px solid #334155;
-        }
-
-        /* --- TELAS E SEÇÕES --- */
-        .screen {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-            flex-grow: 1;
-        }
-
-        .screen.active {
-            display: flex;
-        }
-
-        h2 {
-            font-size: 1.3rem;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        /* --- BOTÕES --- */
-        .btn {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-            text-align: center;
-            width: 100%;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: var(--card-bg);
-            border: 1px solid #334155;
-            color: var(--text-light);
-        }
-
-        .btn-danger {
-            background: var(--alert-red);
-        }
-
-        .btn-success {
-            background: var(--success-green);
-        }
-
-        /* --- MENSAGEM DE SIMULAÇÃO (FEED) --- */
-        .chat-box {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 15px;
-            border-left: 4px solid var(--accent-purple);
-            margin-bottom: 10px;
-        }
-
-        .chat-header {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .chat-body {
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        /* --- GRID DE MISSÕES --- */
-        .mission-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .mission-card {
-            background: var(--card-bg);
-            border: 1px solid #334155;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .mission-card:hover {
-            border-color: var(--accent-purple);
-            background: #26334d;
-        }
-
-        .mission-card span {
-            font-size: 1.8rem;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        /* --- BARRA DE PROGRESSO --- */
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #334155;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent-purple);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        /* --- NAVEGAÇÃO INFERIOR --- */
-        nav {
-            display: flex;
-            justify-content: space-around;
-            padding-top: 15px;
-            border-top: 1px solid #334155;
-            margin-top: auto;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .nav-btn.active {
-            color: var(--accent-purple);
-            font-weight: bold;
-        }
-
-        /* --- FORMULÁRIOS & MODAIS --- */
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: var(--card-bg);
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .feedback-box {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .feedback-box.correct {
-            border: 1px solid var(--success-green);
-        }
-
-        .feedback-box.incorrect {
-            border: 1px solid var(--alert-red);
-        }
+        .bg-navy { background-color: #102F4A; }
+        .text-navy { color: #102F4A; }
+        .bg-emerald-custom { background-color: #00866A; }
+        .text-emerald-custom { color: #00866A; }
+        .border-emerald-custom { border-color: #00866A; }
+        .bg-tech-green { background-color: #20C997; }
+        .text-tech-green { color: #20C997; }
+        .bg-slate-gray { background-color: #EAF1F6; }
+        .text-graphite { color: #263746; }
     </style>
 </head>
-<body>
+<body class="bg-slate-gray text-graphite font-sans antialiased min-h-screen flex flex-col">
 
-<div class="app-container">
-    <header>
-        <div class="logo">🪞 Espelho Digital</div>
-        <div class="stats">
-            <div class="stat-item">🔥 <span id="streak">1</span>d</div>
-            <div class="stat-item">⭐ <span id="xp">0</span> XP</div>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
+        <div class="bg-navy text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium border border-white/10">
+            <i class="fa-solid fa-circle-check text-tech-green text-lg"></i>
+            <span id="toast-msg">Ação realizada com sucesso!</span>
         </div>
-    </header>
+    </div>
 
-    <section id="screen-home" class="screen active">
-        <div style="text-align: center; margin: auto 0;">
-            <span style="font-size: 4rem;">🛡️</span>
-            <h2 style="font-size: 1.8rem; margin-top: 10px;">Aprenda antes que aconteça.</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">
-                Simule situações reais da internet e treine seus reflexos contra golpes e desinformação.
-            </p>
-        </div>
-        <button class="btn" onclick="navigateTo('screen-missions')">Começar Missão</button>
-    </section>
-
-    <section id="screen-missions" class="screen">
-        <h2>Escolha um Desafio</h2>
-        <div class="mission-grid">
-            <div class="mission-card" onclick="startQuiz('fakenews')">
-                <span>📰</span>
-                <strong>Fake News</strong>
-            </div>
-            <div class="mission-card" onclick="startQuiz('golpes')">
-                <span>🎣</span>
-                <strong>Golpes</strong>
-            </div>
-            <div class="mission-card" onclick="startQuiz('deepfake')">
-                <span>🎭</span>
-                <strong>Deepfake</strong>
-            </div>
-            <div class="mission-card" onclick="startQuiz('seguranca')">
-                <span>🔒</span>
-                <strong>Segurança</strong>
-            </div>
-        </div>
-    </section>
-
-    <section id="screen-quiz" class="screen">
-        <div class="progress-bar">
-            <div id="quiz-progress" class="progress-fill"></div>
-        </div>
+    <div class="flex flex-col md:flex-row min-h-screen">
         
-        <div class="chat-box">
-            <div class="chat-header">
-                <span id="quiz-sender">📱 Notificação Recebida</span>
-                <span>Agora</span>
+        <!-- SIDEBAR (MENU LATERAL ESQUERDO) -->
+        <aside class="w-full md:w-72 bg-navy text-white flex flex-col justify-between p-6 shadow-xl z-30 shrink-0">
+            <div>
+                <!-- Logo & Nome -->
+                <div class="flex items-center space-x-3 mb-10 cursor-pointer" onclick="switchTab('inicio')">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-custom flex items-center justify-center text-white text-xl font-black shadow-md">
+                        VB
+                    </div>
+                    <div>
+                        <h1 class="font-black text-xl tracking-tight text-white">VB<span class="text-tech-green">-ON</span></h1>
+                        <p class="text-xs text-slate-gray font-medium">Várzea Branca — Piauí</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="space-y-2">
+                    <button onclick="switchTab('inicio')" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-emerald-custom bg-white/10 transition-all text-left">
+                        <i class="fa-solid fa-house w-5"></i>
+                        <span>Início & Catálogo</span>
+                    </button>
+                    <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
+                        <i class="fa-solid fa-user-plus w-5"></i>
+                        <span>Cadastrar na Plataforma</span>
+                    </button>
+                    <button onclick="checkAdminAccess()" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
+                        <i class="fa-solid fa-store w-5"></i>
+                        <span>Painel do Comerciante</span>
+                    </button>
+                    <button onclick="switchTab('favoritos')" id="nav-btn-favoritos" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-heart w-5 text-rose-400"></i>
+                            <span>Favoritos</span>
+                        </div>
+                        <span id="fav-badge" class="bg-emerald-custom text-white px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+                    </button>
+                </nav>
             </div>
-            <div id="quiz-content" class="chat-body">
-                Carregando pergunta...
+
+            <!-- Footer / Info no Sidebar -->
+            <div class="pt-6 border-t border-white/10 text-xs text-slate-gray/70">
+                <p class="font-bold text-white mb-1">Várzea branca on-fire 🔥</p>
+                <p>Tecnologia • Empreendedorismo • Conexão</p>
             </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-grow p-4 sm:p-8 overflow-y-auto">
+            <div class="max-w-6xl mx-auto space-y-8">
+
+                <!-- 1. SEÇÃO INÍCIO & CATÁLOGO -->
+                <section id="tab-inicio" class="space-y-8">
+                    <!-- Hero Banner -->
+                    <div class="relative rounded-3xl bg-navy text-white p-8 sm:p-12 overflow-hidden shadow-xl">
+                        <div class="relative z-10 max-w-2xl space-y-6">
+                            <span class="bg-emerald-custom/20 text-tech-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Várzea branca on-fire 🔥</span>
+                            <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">TECNOLOGIA • EMPREENDEDORISMO • CONEXÃO</h2>
+                            <p class="text-slate-gray text-sm sm:text-base leading-relaxed">Divulgue seus produtos, conecte-se com clientes pelo WhatsApp, gerencie suas finanças e simule o crescimento do seu empreendimento em um só lugar.</p>
+                        </div>
+                    </div>
+
+                    <!-- Filtros e Busca do Catálogo -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-xl font-black text-graphite">Vitrine do Comércio Local</h3>
+                                <p class="text-xs text-gray-500">Conectando compradores e comerciantes em Várzea Branca.</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Buscar produtos..." class="bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                <select id="catalog-category" onchange="renderCatalog()" class="bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <option value="">Todas as Categorias</option>
+                                    <option value="Alimentação">Alimentação</option>
+                                    <option value="Vestuário">Vestuário</option>
+                                    <option value="Eletrônicos">Eletrônicos</option>
+                                    <option value="Serviços">Serviços</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                                <select id="catalog-sort" onchange="renderCatalog()" class="bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                    <option value="recentes">Mais Recentes</option>
+                                    <option value="menor-preco">Menor Preço</option>
+                                    <option value="maior-preco">Maior Preço</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Produtos (Lado a lado, preenchendo o espaço) -->
+                    <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Injetado via JS -->
+                    </div>
+                </section>
+
+                <!-- 2. SEÇÃO CADASTRO NA PLATAFORMA -->
+                <section id="tab-cadastro" class="hidden space-y-6 max-w-xl mx-auto">
+                    <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-xl">
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl mx-auto mb-3 shadow-md">
+                                <i class="fa-solid fa-user-plus text-tech-green"></i>
+                            </div>
+                            <h3 class="text-2xl font-extrabold text-graphite">Cadastre seu Negócio no VB-ON</h3>
+                            <p class="text-gray-500 text-xs mt-1">Crie sua conta para divulgar produtos e usar o painel financeiro</p>
+                        </div>
+
+                        <form onsubmit="handlePublicRegister(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Negócio / Comerciante</label>
+                                <input type="text" id="reg-input-name" required placeholder="Ex: Loja da Maria" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Usuário / Login</label>
+                                <input type="text" id="reg-input-user" required placeholder="Ex: maria123" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Senha</label>
+                                <input type="password" id="reg-input-pass" required placeholder="••••••" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Cadastrar e Entrar no Painel</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- 3. SEÇÃO FAVORITOS -->
+                <section id="tab-favoritos" class="hidden space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-graphite">Meus Produtos Favoritos</h2>
+                        <p class="text-sm text-gray-500">Lista rápida dos itens que você salvou para conferir depois.</p>
+                    </div>
+                    <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Injetado via JS -->
+                    </div>
+                </section>
+
+                <!-- 4. PAINEL DO COMERCIANTE -->
+                <section id="tab-painel" class="hidden space-y-8">
+                    <!-- Header do Painel -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-14 h-14 rounded-2xl bg-navy text-white flex items-center justify-center text-2xl font-bold shadow-md">
+                                <i class="fa-solid fa-shop"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-black text-graphite" id="merchant-welcome-name">Painel do Comerciante</h2>
+                                <p class="text-xs text-gray-500">Gerencie estoque, finanças e simule vendas.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="openProfileModal()" class="bg-slate-gray hover:bg-gray-200 text-graphite font-semibold px-4 py-2 rounded-xl text-xs transition-all"><i class="fa-solid fa-gear mr-1"></i> Configurações</button>
+                            <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2 rounded-xl text-xs transition-all"><i class="fa-solid fa-right-from-bracket mr-1"></i> Sair</button>
+                        </div>
+                    </div>
+
+                    <!-- Subtabs Nav -->
+                    <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
+                        <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-custom text-white shadow-sm transition-all">Meus Produtos & Estoque</button>
+                        <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Gestão Financeira & Gráficos</button>
+                        <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Registro de Vendas</button>
+                        <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Calculadora Comercial</button>
+                        <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-graphite hover:bg-slate-gray transition-all">Simulador de Negócios</button>
+                    </div>
+
+                    <!-- SUBTAB: PRODUTOS -->
+                    <div id="subtab-produtos" class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-graphite">Gerenciamento de Produtos</h3>
+                            <button onclick="openProductModal()" class="bg-emerald-custom text-white font-semibold px-5 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-xs">
+                                <i class="fa-solid fa-plus mr-1"></i> Cadastrar Produto
+                            </button>
+                        </div>
+                        <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Injetado via JS -->
+                        </div>
+                    </div>
+
+                    <!-- SUBTAB: FINANCEIRO -->
+                    <div id="subtab-financeiro" class="hidden space-y-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Geral</p>
+                                <h4 class="text-2xl font-extrabold text-tech-green" id="kpi-receita">R$ 0,00</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos Totais</p>
+                                <h4 class="text-2xl font-extrabold text-amber-600" id="kpi-custos">R$ 0,00</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas Operacionais</p>
+                                <h4 class="text-2xl font-extrabold text-rose-600" id="kpi-despesas">R$ 0,00</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro Líquido</p>
+                                <h4 class="text-2xl font-extrabold text-tech-green" id="kpi-lucro">R$ 0,00</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Capital Inicial</p>
+                                <h4 class="text-2xl font-extrabold text-navy" id="kpi-capital">R$ 0,00</h4>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                                <h4 class="font-bold text-graphite mb-4">Fluxo Financeiro (Receitas x Gastos)</h4>
+                                <div class="h-64"><canvas id="financeChart1"></canvas></div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                                <h4 class="font-bold text-graphite mb-4">Composição de Custos e Despesas</h4>
+                                <div class="h-64"><canvas id="financeChart2"></canvas></div>
+                            </div>
+                        </div>
+
+                        <!-- Lançamentos Table -->
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                                <span class="font-bold text-graphite">Histórico de Lançamentos</span>
+                                <div class="flex gap-2">
+                                    <button onclick="openExpenseModal()" class="bg-emerald-custom text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:opacity-95"><i class="fa-solid fa-plus mr-1"></i> Novo Lançamento</button>
+                                    <button onclick="exportFinancialPDF()" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-4 py-2 rounded-xl"><i class="fa-solid fa-download mr-1"></i> Exportar Relatório</button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-gray text-gray-600 uppercase text-xs">
+                                        <tr>
+                                            <th class="px-6 py-3">Data</th>
+                                            <th class="px-6 py-3">Tipo</th>
+                                            <th class="px-6 py-3">Descrição</th>
+                                            <th class="px-6 py-3">Valor</th>
+                                            <th class="px-6 py-3 text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenses-table-body" class="divide-y divide-gray-200">
+                                        <!-- Injetado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBTAB: REGISTRO DE VENDAS -->
+                    <div id="subtab-calendario" class="hidden space-y-6">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-graphite mb-4">Registrar Nova Venda</h3>
+                            <form onsubmit="handleSaleSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Data da Venda</label>
+                                    <input type="date" id="sale-date" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Produto</label>
+                                    <select id="sale-product" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                        <!-- Preenchido via JS -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Quantidade</label>
+                                    <input type="number" id="sale-qty" min="1" value="1" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Total Recebido (R$)</label>
+                                    <input type="number" step="0.01" id="sale-total" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição / Cliente</label>
+                                    <input type="text" id="sale-desc" placeholder="Ex: Venda à vista para João" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div class="sm:col-span-2 flex items-end">
+                                    <button type="submit" class="w-full bg-emerald-custom text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">
+                                        <i class="fa-solid fa-cart-plus mr-2"></i> Registrar Venda (Baixa Automática no Estoque)
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Histórico de Vendas -->
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <span class="font-bold text-graphite">Histórico de Vendas Registradas</span>
+                                <select id="sales-filter-period" onchange="renderSales()" class="bg-slate-gray border border-gray-300 rounded-xl px-3 py-1.5 text-xs text-graphite">
+                                    <option value="todos">Todos os períodos</option>
+                                    <option value="mes">Este mês</option>
+                                </select>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-gray text-gray-600 uppercase text-xs">
+                                        <tr>
+                                            <th class="px-6 py-3">Data</th>
+                                            <th class="px-6 py-3">Produto</th>
+                                            <th class="px-6 py-3">Qtd</th>
+                                            <th class="px-6 py-3">Valor Total</th>
+                                            <th class="px-6 py-3">Descrição</th>
+                                            <th class="px-6 py-3 text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sales-table-body" class="divide-y divide-gray-200">
+                                        <!-- Injetado via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBTAB: CALCULADORA -->
+                    <div id="subtab-calculadora" class="hidden space-y-6">
+                        <div class="max-w-xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
+                                <h3 class="text-lg font-bold text-graphite mb-4 text-center">Calculadora Comercial</h3>
+                                <div class="mb-4">
+                                    <input type="text" id="calc-screen" readonly class="w-full bg-navy text-white text-right text-3xl font-mono px-4 py-4 rounded-2xl shadow-inner tracking-wider" value="0">
+                                </div>
+                                <div class="grid grid-cols-4 gap-3">
+                                    <button onclick="calcClear()" class="bg-rose-100 text-rose-700 font-bold py-3.5 rounded-xl hover:bg-rose-200 transition-all">C</button>
+                                    <button onclick="calcAppend('%')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">%</button>
+                                    <button onclick="calcAppend('/')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">÷</button>
+                                    <button onclick="calcAppend('*')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">×</button>
+
+                                    <button onclick="calcAppend('7')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">7</button>
+                                    <button onclick="calcAppend('8')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">8</button>
+                                    <button onclick="calcAppend('9')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">9</button>
+                                    <button onclick="calcAppend('-')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">-</button>
+
+                                    <button onclick="calcAppend('4')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">4</button>
+                                    <button onclick="calcAppend('5')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">5</button>
+                                    <button onclick="calcAppend('6')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">6</button>
+                                    <button onclick="calcAppend('+')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">+</button>
+
+                                    <button onclick="calcAppend('1')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">1</button>
+                                    <button onclick="calcAppend('2')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">2</button>
+                                    <button onclick="calcAppend('3')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">3</button>
+                                    <button onclick="calcCompute()" class="row-span-2 bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all flex items-center justify-center">=</button>
+
+                                    <button onclick="calcAppend('0')" class="col-span-2 bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">0</button>
+                                    <button onclick="calcAppend('.')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">.</button>
+                                </div>
+                            </div>
+
+                            <!-- Histórico da Calculadora -->
+                            <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg flex flex-col">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold text-graphite">Histórico de Cálculos</h4>
+                                    <button onclick="clearCalcHistory()" class="text-xs text-rose-600 hover:underline">Limpar</button>
+                                </div>
+                                <div id="calc-history-list" class="flex-grow space-y-2 overflow-y-auto max-h-80 text-sm font-mono text-graphite">
+                                    <!-- Injetado via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBTAB: SIMULADOR DE INVESTIMENTOS -->
+                    <div id="subtab-simulador" class="hidden space-y-8">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-graphite mb-4">Simulador de Viabilidade de Negócios</h3>
+                            <form onsubmit="handleSimulation(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Capital Disponível (R$)</label>
+                                    <input type="number" step="0.01" id="sim-capital" value="1000" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Custo de Ingredientes/Matéria (R$)</label>
+                                    <input type="number" step="0.01" id="sim-custo-unit" value="5.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Embalagens por Unidade (R$)</label>
+                                    <input type="number" step="0.01" id="sim-embalagem" value="1.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Despesas Fixas Adicionais (R$)</label>
+                                    <input type="number" step="0.01" id="sim-despesas" value="150.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. que Pretende Produzir</label>
+                                    <input type="number" id="sim-qtd-produzir" value="200" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Preço de Venda Unitário (R$)</label>
+                                    <input type="number" step="0.01" id="sim-preco-venda" value="15.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. Estimada de Vendas</label>
+                                    <input type="number" id="sim-qtd-vendas" value="180" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="submit" class="w-full bg-emerald-custom text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">
+                                        <i class="fa-solid fa-chart-line mr-2"></i> Simular Cenário
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Simulation Results -->
+                        <div id="sim-results" class="hidden space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Investimento Necessário</p>
+                                    <h4 class="text-2xl font-extrabold text-graphite" id="res-investimento">R$ 0,00</h4>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custo por Unidade</p>
+                                    <h4 class="text-2xl font-extrabold text-amber-600" id="res-custo-unit">R$ 0,00</h4>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Projetada</p>
+                                    <h4 class="text-2xl font-extrabold text-tech-green" id="res-receita">R$ 0,00</h4>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro / Prejuízo</p>
+                                    <h4 class="text-2xl font-extrabold" id="res-lucro">R$ 0,00</h4>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Margem de Lucro</p>
+                                    <h4 class="text-xl font-extrabold text-emerald-custom" id="res-margem">0%</h4>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ponto de Equilíbrio (Break-even)</p>
+                                    <h4 class="text-xl font-extrabold text-navy" id="res-breakeven">0 unidades</h4>
+                                </div>
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Viabilidade</p>
+                                    <h4 class="text-xl font-extrabold" id="res-status">-</h4>
+                                </div>
+                            </div>
+
+                            <!-- Cenários -->
+                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                                <h4 class="text-base font-bold text-graphite mb-4">Análise Comparativa de Cenários</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="scenarios-grid">
+                                    <!-- Injetado via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="mt-16 py-6 text-center text-sm text-gray-500 border-t border-gray-200">
+                <p class="font-bold text-graphite">VB-ON — Várzea Branca, Piauí</p>
+                <p class="mt-1">Várzea branca on-fire 🔥 | Tecnologia • Empreendedorismo • Conexão</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MODAL: PRODUTO -->
+    <div id="product-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-8 shadow-2xl relative my-8">
+            <button onclick="closeProductModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-extrabold text-graphite mb-6" id="product-modal-title">Cadastrar Novo Produto</h3>
+
+            <form onsubmit="handleProductSubmit(event)" class="space-y-4">
+                <input type="hidden" id="prod-edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Produto</label>
+                        <input type="text" id="prod-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Categoria</label>
+                        <select id="prod-cat" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Vestuário">Vestuário</option>
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Serviços">Serviços</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Preço (R$)</label>
+                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. em Estoque</label>
+                        <input type="number" id="prod-stock" min="0" value="10" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Localização</label>
+                        <input type="text" id="prod-location" value="Várzea Branca - PI" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Foto de Capa (Selecione do Dispositivo)</label>
+                    <input type="file" id="prod-img-file" accept="image/*" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-custom hover:file:bg-emerald-100 text-graphite">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Link do WhatsApp para Contato (com DDD)</label>
+                    <input type="text" id="prod-whatsapp" placeholder="Ex: 5589999999999" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição Completa</label>
+                    <textarea id="prod-desc" rows="3" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-custom text-graphite"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Produto</button>
+            </form>
         </div>
+    </div>
 
-        <div id="quiz-options" style="display: flex; flex-direction: column; gap: 8px;">
-            </div>
+    <!-- MODAL: DADOS COMERCIAIS -->
+    <div id="profile-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-extrabold text-graphite mb-6">Configurações Comerciais</h3>
 
-        <div id="feedback-box" class="feedback-box">
-            <h3 id="feedback-title"></h3>
-            <p id="feedback-text" style="font-size: 0.85rem; color: var(--text-muted);"></p>
-            <button class="btn" onclick="nextQuestion()">Próxima Rodada ➔</button>
+            <form onsubmit="handleProfileSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Negócio</label>
+                    <input type="text" id="prof-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Horário de Funcionamento</label>
+                    <input type="text" id="prof-hours" placeholder="Ex: Seg a Sex, 08h às 18h" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp Principal</label>
+                    <input type="text" id="prof-whatsapp" placeholder="Ex: 5589999999999" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                </div>
+                <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Alterações</button>
+            </form>
         </div>
-    </section>
+    </div>
 
-    <section id="screen-teacher" class="screen">
-        <h2>👨‍🏫 Painel do Professor</h2>
-        
-        <div id="teacher-auth" style="display: flex; flex-direction: column; gap: 10px; margin: auto 0;">
-            <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted);">
-                Acesso restrito. Digite a senha para visualizar os relatórios da turma.
-            </p>
-            <input type="password" id="teacher-pass" placeholder="Senha do Professor (padrão: 1234)">
-            <button class="btn" onclick="authTeacher()">Acessar Painel</button>
-            <p id="auth-error" style="color: var(--alert-red); font-size: 0.8rem; text-align: center; display: none;">
-                Senha incorreta! Tente novamente.
-            </p>
+    <!-- MODAL: LANÇAMENTO FINANCEIRO -->
+    <div id="expense-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onclick="closeExpenseModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-extrabold text-graphite mb-6">Registrar Lançamento Financeiro</h3>
+
+            <form onsubmit="handleExpenseSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Tipo de Lançamento</label>
+                    <select id="exp-type" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                        <option value="Custo">Custo (Gastos diretos com produtos)</option>
+                        <option value="Despesa">Despesa (Gastos operacionais do negócio)</option>
+                        <option value="Capital">Capital Inicial (Valor investido)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Data</label>
+                    <input type="date" id="exp-date" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição</label>
+                    <input type="text" id="exp-desc" placeholder="Ex: Compra de matéria-prima, Aluguel..." required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Valor (R$)</label>
+                    <input type="number" step="0.01" id="exp-val" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                </div>
+                <button type="submit" class="w-full bg-emerald-custom text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Lançamento</button>
+            </form>
         </div>
+    </div>
 
-        <div id="teacher-content" style="display: none; flex-direction: column; gap: 12px;">
-            <div style="background: var(--card-bg); padding: 12px; border-radius: 8px;">
-                <h4 style="margin-bottom: 5px;">📊 Desempenho Geral</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">
-                    • 80% de precisão em Fake News<br>
-                    • 45% de precisão em Golpes Digitais (Atenção!)
-                </p>
-            </div>
-            <div style="background: var(--card-bg); padding: 12px; border-radius: 8px;">
-                <h4 style="margin-bottom: 5px;">💡 Recomendação da IA</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">
-                    Recomenda-se aplicar uma atividade prática sobre links maliciosos e *phishing*.
-                </p>
-            </div>
-            <button class="btn btn-secondary" onclick="logoutTeacher()">Sair do Painel</button>
-        </div>
-    </section>
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let db = JSON.parse(localStorage.getItem('conecta_vb_db_v5')) || {
+            currentUser: null,
+            merchants: [
+                { user: 'adm', pass: '123', name: 'Comércio Exemplo VB', hours: 'Seg a Sáb, 08h às 18h', whatsapp: '5589999999999' }
+            ],
+            products: [
+                { id: '1', user: 'adm', name: 'Bolo Artesanal de Chocolate', cat: 'Alimentação', price: 45.00, stock: 12, location: 'Várzea Branca - PI', whatsapp: '5589999999999', desc: 'Bolo caseiro fresquinho, feito com ingredientes selecionados.', img: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80' },
+                { id: '2', user: 'adm', name: 'Artesanato em Barro Regional', cat: 'Outros', price: 60.00, stock: 4, location: 'Várzea Branca - PI', whatsapp: '5589999999999', desc: 'Peça decorativa artesanal feita por ceramistas locais.', img: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=600&q=80' }
+            ],
+            sales: [
+                { id: '1', user: 'adm', date: '2026-11-01', product: 'Bolo Artesanal de Chocolate', qty: 2, total: 90.00, desc: 'Encomenda festiva' }
+            ],
+            expenses: [
+                { id: '1', user: 'adm', type: 'Capital', date: '2026-10-01', desc: 'Capital inicial investido', val: 1000.00 },
+                { id: '2', user: 'adm', type: 'Custo', date: '2026-11-02', desc: 'Ingredientes para bolos', val: 150.00 },
+                { id: '3', user: 'adm', type: 'Despesa', date: '2026-11-05', desc: 'Embalagens e sacolas', val: 60.00 }
+            ],
+            favorites: [],
+            calcHistory: []
+        };
 
-    <section id="screen-creator" class="screen">
-        <h2>🛠️ Modo Criador</h2>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">
-            Encontrou uma suspeita na internet? Envie aqui. A IA removerá dados pessoais e criará um desafio para a turma!
-        </p>
-        <form onsubmit="submitCustomChallenge(event)" style="display: flex; flex-direction: column; gap: 10px;">
-            <select id="create-category" required>
-                <option value="">Selecione a Categoria</option>
-                <option value="golpes">Golpes Digitais</option>
-                <option value="fakenews">Fake News</option>
-            </select>
-            <textarea id="create-text" rows="4" placeholder="Cole aqui a mensagem suspeita..." required></textarea>
-            <button type="submit" class="btn btn-success">Enviar para a IA Processar</button>
-        </form>
-    </section>
+        function saveDB() {
+            localStorage.setItem('conecta_vb_db_v5', JSON.stringify(db));
+        }
 
-    <nav>
-        <button class="nav-btn active" onclick="navigateTo('screen-home', this)">
-            🏠<span>Início</span>
-        </button>
-        <button class="nav-btn" onclick="navigateTo('screen-missions', this)">
-            🎯<span>Missões</span>
-        </button>
-        <button class="nav-btn" onclick="navigateTo('screen-creator', this)">
-            🛠️<span>Criar</span>
-        </button>
-        <button class="nav-btn" onclick="navigateTo('screen-teacher', this)">
-            👨‍🏫<span>Professor</span>
-        </button>
-    </nav>
-</div>
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-[-200%]');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-200%]');
+            }, 3000);
+        }
 
-<script>
-    /* --- DADOS DAS PERGUNTAS / RODADAS --- */
-    const questionBank = {
-        golpes: [
-            {
-                content: "URGENTE! Governo libera R$ 2.000 para estudantes. Clique aqui para receber: http://beneficio-fake.com",
-                options: [
-                    { text: "Verificar Informação", correct: true, feedback: "Excelente! A mensagem cria senso de urgência e usa um link não oficial (.com em vez de .gov.br)." },
-                    { text: "Compartilhar no Grupo", correct: false, feedback: "Atenção! Esta mensagem apresenta sinais claros de golpe: urgência e promessa de dinheiro fácil." },
-                    { text: "Clicar no Link", correct: false, feedback: "Cuidado! Clicar em links desconhecidos pode roubar seus dados ou infectar seu celular." }
-                ]
-            },
-            {
-                content: "Seu banco informa: Sua conta foi bloqueada por atividade suspeita. Atualize seus dados agora em: http://seu-banco-seguro-login.com",
-                options: [
-                    { text: "Acessar o link e atualizar", correct: false, feedback: "Erro! Bancos nunca solicitam recadastramento por SMS ou links externos." },
-                    { text: "Ignorar e checar no app oficial do banco", correct: true, feedback: "Correto! Sempre utilize os canais oficiais do banco para checar pendências." }
-                ]
+        // --- NAVIGATION TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('main > .max-w-6xl > section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-white/10', 'text-emerald-custom');
+                btn.classList.add('text-white/80');
+            });
+            const activeBtn = document.getElementById('nav-btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-white/10', 'text-emerald-custom');
+                activeBtn.classList.remove('text-white/80');
             }
-        ],
-        fakenews: [
-            {
-                content: "BOMBA! Cientistas descobrem que beber água fervida com alho cura qualquer vírus instantaneamente!",
-                options: [
-                    { text: "Checar em sites de checagem (ex: Aos Fatos)", correct: true, feedback: "Boa! Informações de saúde milagrosas sem comprovação científica costumam ser falsas." },
-                    { text: "Enviar para a família", correct: false, feedback: "Cuidado! Repassar notícias sem checar pode colocar a saúde de pessoas em risco." }
-                ]
+
+            if(tabId === 'inicio') renderCatalog();
+            if(tabId === 'favoritos') renderFavorites();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchSubTab(subId) {
+            document.querySelectorAll('#tab-painel > div:not(:first-child):not(.flex)').forEach(el => el.classList.add('hidden'));
+            document.getElementById('subtab-' + subId).classList.remove('hidden');
+
+            document.querySelectorAll('.subtab-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-custom', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-white', 'text-graphite');
+            });
+            const activeBtn = document.getElementById('subtab-btn-' + subId);
+            activeBtn.classList.add('bg-emerald-custom', 'text-white', 'shadow-sm');
+            activeBtn.classList.remove('bg-white', 'text-graphite');
+
+            if(subId === 'produtos') renderMerchantProducts();
+            if(subId === 'financeiro') { renderFinancials(); initCharts(); }
+            if(subId === 'calendario') renderSales();
+            if(subId === 'calculadora') renderCalcHistory();
+        }
+
+        // --- AUTH & PUBLIC REGISTER ---
+        function checkAdminAccess() {
+            if(!db.currentUser) {
+                switchTab('cadastro');
+                showToast('Cadastre-se ou acesse com uma conta para gerenciar.');
+            } else {
+                switchTab('painel');
+                switchSubTab('produtos');
             }
-        ]
-    };
-
-    /* --- ESTADO DO JOGO --- */
-    let currentCategory = '';
-    let currentRound = 0;
-    let scoreXP = 0;
-    const TEACHER_PASSWORD = "1234"; // Senha configurada para o Painel
-
-    /* --- NAVEGAÇÃO --- */
-    function navigateTo(screenId, btnElement = null) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-
-        if (btnElement) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
-        }
-    }
-
-    /* --- INICIAR RODADAS DO QUIZ --- */
-    function startQuiz(category) {
-        if (!questionBank[category]) {
-            alert('Em breve novas perguntas para esta categoria!');
-            return;
-        }
-        currentCategory = category;
-        currentRound = 0;
-        navigateTo('screen-quiz');
-        loadQuestion();
-    }
-
-    function loadQuestion() {
-        const questions = questionBank[currentCategory];
-        const total = questions.length;
-        
-        if (currentRound >= total) {
-            alert(`🎉 Missão Concluída! Você ganhou XP nessa rodada.`);
-            navigateTo('screen-missions');
-            return;
         }
 
-        // Atualiza Barra de Progresso
-        const progressPercent = ((currentRound + 1) / total) * 100;
-        document.getElementById('quiz-progress').style.width = progressPercent + '%';
+        function handlePublicRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-input-name').value.trim();
+            const user = document.getElementById('reg-input-user').value.trim();
+            const pass = document.getElementById('reg-input-pass').value.trim();
 
-        const q = questions[currentRound];
-        document.getElementById('quiz-content').innerText = `"${q.content}"`;
+            if(db.merchants.some(m => m.user === user)) {
+                alert('Este usuário já existe. Escolha outro.');
+                return;
+            }
 
-        // Oculta feedback e mostra botões
-        document.getElementById('feedback-box').style.display = 'none';
-        const optionsDiv = document.getElementById('quiz-options');
-        optionsDiv.style.display = 'flex';
-        optionsDiv.innerHTML = '';
+            db.merchants.push({ user, pass, name, hours: 'Seg a Sex, 08h às 18h', whatsapp: '5589999999999' });
+            db.currentUser = user;
+            saveDB();
+            showToast('Cadastro realizado com sucesso!');
+            switchTab('painel');
+            switchSubTab('produtos');
+        }
 
-        q.options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-secondary';
-            btn.innerText = opt.text;
-            btn.onclick = () => selectOption(opt);
-            optionsDiv.appendChild(btn);
+        function logoutAdmin() {
+            db.currentUser = null;
+            saveDB();
+            switchTab('inicio');
+            showToast('Sessão encerrada.');
+        }
+
+        // --- PUBLIC CATALOG, FAVORITES & SHARING ---
+        function toggleFavorite(id) {
+            if(db.favorites.includes(id)) {
+                db.favorites = db.favorites.filter(favId => favId !== id);
+                showToast('Removido dos favoritos.');
+            } else {
+                db.favorites.push(id);
+                showToast('Adicionado aos favoritos!');
+            }
+            saveDB();
+            updateFavBadge();
+            if(!document.getElementById('tab-inicio').classList.contains('hidden')) renderCatalog();
+            if(!document.getElementById('tab-favoritos').classList.contains('hidden')) renderFavorites();
+        }
+
+        function updateFavBadge() {
+            document.getElementById('fav-badge').innerText = db.favorites.length;
+        }
+
+        function shareProduct(name, price) {
+            const text = `Confira este produto incrível em Várzea Branca–PI: *${name}* por apenas R$ ${price.toFixed(2)} no VB-ON!`;
+            if(navigator.share) {
+                navigator.share({ title: 'VB-ON', text: text, url: window.location.href }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(text);
+                showToast('Link e texto copiados para a área de transferência!');
+            }
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalog-grid');
+            const search = document.getElementById('catalog-search').value.toLowerCase();
+            const cat = document.getElementById('catalog-category').value;
+            const sort = document.getElementById('catalog-sort').value;
+
+            let filtered = db.products.filter(p => {
+                const matchSearch = p.name.toLowerCase().includes(search) || p.desc.toLowerCase().includes(search);
+                const matchCat = cat === '' || p.cat === cat;
+                return matchSearch && matchCat;
+            });
+
+            if(sort === 'menor-preco') filtered.sort((a,b) => a.price - b.price);
+            if(sort === 'maior-preco') filtered.sort((a,b) => b.price - a.price);
+            if(sort === 'recentes') filtered.sort((a,b) => parseInt(b.id) - parseInt(a.id));
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400"><i class="fa-solid fa-box-open text-4xl mb-3"></i><p>Nenhum produto encontrado.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => {
+                const isFav = db.favorites.includes(p.id);
+                const isOut = p.stock <= 0;
+                return `
+                    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col relative">
+                        <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-rose-500 shadow-md hover:scale-105 transition-all">
+                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
+                        </button>
+                        <div class="h-48 bg-slate-gray overflow-hidden relative">
+                            <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-bold px-3 py-1 rounded-full text-graphite">${p.cat}</span>
+                            ${isOut ? '<span class="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold uppercase tracking-wider text-sm">Esgotado</span>' : ''}
+                        </div>
+                        <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-graphite text-base line-clamp-1">${p.name}</h3>
+                                    <span class="font-extrabold text-emerald-custom text-lg">R$ ${p.price.toFixed(2)}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+                                    <span><i class="fa-solid fa-location-dot mr-1 text-emerald-custom"></i> ${p.location}</span>
+                                    <span class="${p.stock <= 3 && p.stock > 0 ? 'text-amber-600 font-bold' : ''}">Estoque: ${p.stock}</span>
+                                </div>
+                                <p class="text-graphite text-sm line-clamp-2">${p.desc}</p>
+                            </div>
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                                <button onclick="shareProduct('${p.name}', ${p.price})" class="text-gray-500 hover:text-emerald-custom text-xs font-semibold flex items-center gap-1" title="Compartilhar">
+                                    <i class="fa-solid fa-share-nodes"></i> Compartilhar
+                                </button>
+                                <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="bg-emerald-custom text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 hover:opacity-95">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFavorites() {
+            const grid = document.getElementById('favorites-grid');
+            const favProducts = db.products.filter(p => db.favorites.includes(p.id));
+
+            if(favProducts.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400"><i class="fa-regular fa-heart text-4xl mb-3"></i><p>Você ainda não favoritou nenhum produto.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = favProducts.map(p => `
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col relative">
+                    <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-rose-500 shadow-md">
+                        <i class="fa-solid fa-heart text-lg"></i>
+                    </button>
+                    <div class="h-48 bg-slate-gray overflow-hidden">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 class="font-bold text-graphite text-base">${p.name}</h3>
+                            <span class="font-extrabold text-emerald-custom text-lg">R$ ${p.price.toFixed(2)}</span>
+                            <p class="text-graphite text-sm line-clamp-2 mt-2">${p.desc}</p>
+                        </div>
+                        <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="w-full bg-emerald-custom text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> Contatar pelo WhatsApp
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- MERCHANT PRODUCTS CRUD ---
+        let currentImageBase64 = '';
+
+        document.getElementById('prod-img-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentImageBase64 = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         });
-    }
 
-    function selectOption(option) {
-        document.getElementById('quiz-options').style.display = 'none';
-        const feedbackBox = document.getElementById('feedback-box');
-        feedbackBox.style.display = 'flex';
+        function renderMerchantProducts() {
+            const grid = document.getElementById('merchant-products-grid');
+            const myProducts = db.products.filter(p => p.user === db.currentUser);
+            
+            const merchantObj = db.merchants.find(m => m.user === db.currentUser);
+            if(merchantObj) {
+                document.getElementById('merchant-welcome-name').innerText = 'Painel de ' + merchantObj.name;
+            }
 
-        if (option.correct) {
-            feedbackBox.className = 'feedback-box correct';
-            document.getElementById('feedback-title').innerText = '🟢 Boa decisão!';
-            scoreXP += 100;
-            document.getElementById('xp').innerText = scoreXP;
-        } else {
-            feedbackBox.className = 'feedback-box incorrect';
-            document.getElementById('feedback-title').innerText = '🔴 Atenção!';
+            if(myProducts.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400"><i class="fa-solid fa-box-archive text-4xl mb-3"></i><p>Você ainda não cadastrou nenhum produto.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = myProducts.map(p => `
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
+                    <div class="h-40 bg-slate-gray relative">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                        <span class="absolute top-3 left-3 bg-white/90 text-xs font-bold px-2.5 py-1 rounded-full text-graphite">${p.cat}</span>
+                    </div>
+                    <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
+                        <div>
+                            <h4 class="font-bold text-graphite">${p.name}</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-emerald-custom font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-md font-bold ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-slate-gray text-graphite'}">Estoque: ${p.stock} un.</span>
+                            </div>
+                            <p class="text-graphite text-xs line-clamp-2 mt-1">${p.desc}</p>
+                        </div>
+                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                            <button onclick="editProduct('${p.id}')" class="bg-slate-gray hover:bg-gray-200 text-navy text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
+                            <button onclick="deleteProduct('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash mr-1"></i> Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const prodSelect = document.getElementById('sale-product');
+            prodSelect.innerHTML = myProducts.map(p => `<option value="${p.name}">${p.name} (Estoque: ${p.stock})</option>`).join('');
         }
 
-        document.getElementById('feedback-text').innerText = option.feedback;
-    }
-
-    function nextQuestion() {
-        currentRound++;
-        loadQuestion();
-    }
-
-    /* --- AUTENTICAÇÃO DO PROFESSOR --- */
-    function authTeacher() {
-        const inputPass = document.getElementById('teacher-pass').value;
-        const errorMsg = document.getElementById('auth-error');
-
-        if (inputPass === TEACHER_PASSWORD) {
-            document.getElementById('teacher-auth').style.display = 'none';
-            document.getElementById('teacher-content').style.display = 'flex';
-            errorMsg.style.display = 'none';
-            document.getElementById('teacher-pass').value = '';
-        } else {
-            errorMsg.style.display = 'block';
+        function openProductModal(editId = null) {
+            document.getElementById('product-modal').classList.remove('hidden');
+            currentImageBase64 = '';
+            if(editId) {
+                document.getElementById('product-modal-title').innerText = 'Editar Produto & Estoque';
+                const p = db.products.find(item => item.id === editId);
+                document.getElementById('prod-edit-id').value = p.id;
+                document.getElementById('prod-name').value = p.name;
+                document.getElementById('prod-cat').value = p.cat;
+                document.getElementById('prod-price').value = p.price;
+                document.getElementById('prod-stock').value = p.stock;
+                document.getElementById('prod-location').value = p.location;
+                document.getElementById('prod-whatsapp').value = p.whatsapp;
+                document.getElementById('prod-desc').value = p.desc;
+                currentImageBase64 = p.img;
+            } else {
+                document.getElementById('product-modal-title').innerText = 'Cadastrar Novo Produto';
+                document.getElementById('prod-edit-id').value = '';
+                document.getElementById('prod-name').value = '';
+                document.getElementById('prod-price').value = '';
+                document.getElementById('prod-stock').value = '10';
+                document.getElementById('prod-whatsapp').value = '';
+                document.getElementById('prod-desc').value = '';
+                document.getElementById('prod-img-file').value = '';
+            }
         }
-    }
 
-    function logoutTeacher() {
-        document.getElementById('teacher-auth').style.display = 'flex';
-        document.getElementById('teacher-content').style.display = 'none';
-    }
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
 
-    /* --- MODO CRIADOR --- */
-    function submitCustomChallenge(e) {
-        e.preventDefault();
-        const category = document.getElementById('create-category').value;
-        const text = document.getElementById('create-text').value;
+        function handleProductSubmit(e) {
+            e.preventDefault();
+            const editId = document.getElementById('prod-edit-id').value;
+            const name = document.getElementById('prod-name').value;
+            const cat = document.getElementById('prod-cat').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const stock = parseInt(document.getElementById('prod-stock').value);
+            const location = document.getElementById('prod-location').value;
+            const whatsapp = document.getElementById('prod-whatsapp').value;
+            const desc = document.getElementById('prod-desc').value;
+            const img = currentImageBase64 || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
 
-        // Adiciona dinamicamente ao banco de perguntas da sessão
-        if (!questionBank[category]) questionBank[category] = [];
-        
-        questionBank[category].push({
-            content: `[Enviado por Aluno] ${text}`,
-            options: [
-                { text: "Verificar e reportar", correct: true, feedback: "Muito bem! A comunidade agradece a ajuda na checagem." },
-                { text: "Acreditar de primeira", correct: false, feedback: "Lembre-se sempre de duvidar antes de divulgar." }
-            ]
-        });
+            if(editId) {
+                const p = db.products.find(item => item.id === editId);
+                p.name = name; p.cat = cat; p.price = price; p.stock = stock; p.location = location; p.whatsapp = whatsapp; p.desc = desc; p.img = img;
+                showToast('Produto e estoque atualizados!');
+            } else {
+                const newP = { id: Date.now().toString(), user: db.currentUser, name, cat, price, stock, location, whatsapp, desc, img };
+                db.products.push(newP);
+                showToast('Produto cadastrado com sucesso!');
+            }
 
-        alert("✨ Desafio enviado! A IA anonimizou a mensagem e adicionou ao banco de dados da escola.");
-        document.getElementById('create-text').value = '';
-        navigateTo('screen-missions');
-    }
-</script>
+            saveDB();
+            closeProductModal();
+            renderMerchantProducts();
+        }
 
+        function editProduct(id) { openProductModal(id); }
+        function deleteProduct(id) {
+            if(confirm('Tem certeza que deseja excluir este produto?')) {
+                db.products = db.products.filter(p => p.id !== id);
+                saveDB();
+                renderMerchantProducts();
+                showToast('Produto excluído.');
+            }
+        }
+
+        // --- PROFILE MODAL ---
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.remove('hidden');
+            const m = db.merchants.find(item => item.user === db.currentUser);
+            if(m) {
+                document.getElementById('prof-name').value = m.name;
+                document.getElementById('prof-hours').value = m.hours || '';
+                document.getElementById('prof-whatsapp').value = m.whatsapp || '';
+            }
+        }
+        function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); }
+        function handleProfileSubmit(e) {
+            e.preventDefault();
+            const m = db.merchants.find(item => item.user === db.currentUser);
+            if(m) {
+                m.name = document.getElementById('prof-name').value;
+                m.hours = document.getElementById('prof-hours').value;
+                m.whatsapp = document.getElementById('prof-whatsapp').value;
+                saveDB();
+                closeProfileModal();
+                showToast('Dados comerciais atualizados!');
+                renderMerchantProducts();
+            }
+        }
+
+        // --- FINANCIAL MANAGEMENT & EXPORT ---
+        function openExpenseModal() {
+            document.getElementById('expense-modal').classList.remove('hidden');
+            document.getElementById('exp-date').valueAsDate = new Date();
+        }
+        function closeExpenseModal() { document.getElementById('expense-modal').classList.add('hidden'); }
+
+        function handleExpenseSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('exp-type').value;
+            const date = document.getElementById('exp-date').value;
+            const desc = document.getElementById('exp-desc').value;
+            const val = parseFloat(document.getElementById('exp-val').value);
+
+            db.expenses.push({ id: Date.now().toString(), user: db.currentUser, type, date, desc, val });
+            saveDB();
+            closeExpenseModal();
+            renderFinancials();
+            initCharts();
+            showToast('Lançamento salvo com sucesso!');
+        }
+
+        function deleteExpense(id) {
+            db.expenses = db.expenses.filter(e => e.id !== id);
+            saveDB();
+            renderFinancials();
+            initCharts();
+            showToast('Lançamento removido.');
+        }
+
+        function exportFinancialPDF() {
+            const mySales = db.sales.filter(s => s.user === db.currentUser);
+            const myExpenses = db.expenses.filter(e => e.user === db.currentUser);
+            const totalReceita = mySales.reduce((acc, s) => acc + s.total, 0);
+            const totalCustos = myExpenses.filter(e => e.type === 'Custo').reduce((acc, e) => acc + e.val, 0);
+            const totalDespesas = myExpenses.filter(e => e.type === 'Despesa').reduce((acc, e) => acc + e.val, 0);
+            const lucro = totalReceita - (totalCustos + totalDespesas);
+
+            let content = `VB-ON - RELATÓRIO FINANCEIRO\n====================================\n\n`;
+            content += `Receita Geral: R$ ${totalReceita.toFixed(2)}\n`;
+            content += `Custos: R$ ${totalCustos.toFixed(2)}\n`;
+            content += `Despesas: R$ ${totalDespesas.toFixed(2)}\n`;
+            content += `Lucro Líquido: R$ ${lucro.toFixed(2)}\n\nLANÇAMENTOS:\n`;
+            
+            myExpenses.forEach(e => {
+                content += `[${e.date}] ${e.type}: ${e.desc} - R$ ${e.val.toFixed(2)}\n`;
+            });
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Relatorio_Financeiro_VBON.txt';
+            a.click();
+            showToast('Relatório exportado com sucesso!');
+        }
+
+        function renderFinancials() {
+            const mySales = db.sales.filter(s => s.user === db.currentUser);
+            const myExpenses = db.expenses.filter(e => e.user === db.currentUser);
+
+            const totalReceita = mySales.reduce((acc, s) => acc + s.total, 0);
+            const totalCustos = myExpenses.filter(e => e.type === 'Custo').reduce((acc, e) => acc + e.val, 0);
+            const totalDespesas = myExpenses.filter(e => e.type === 'Despesa').reduce((acc, e) => acc + e.val, 0);
+            const totalCapital = myExpenses.filter(e => e.type === 'Capital').reduce((acc, e) => acc + e.val, 0);
+            const lucroLiquido = totalReceita - (totalCustos + totalDespesas);
+
+            document.getElementById('kpi-receita').innerText = `R$ ${totalReceita.toFixed(2)}`;
+            document.getElementById('kpi-custos').innerText = `R$ ${totalCustos.toFixed(2)}`;
+            document.getElementById('kpi-despesas').innerText = `R$ ${totalDespesas.toFixed(2)}`;
+            const kpiLucro = document.getElementById('kpi-lucro');
+            kpiLucro.innerText = `R$ ${lucroLiquido.toFixed(2)}`;
+            kpiLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-tech-green' : 'text-rose-600'}`;
+            document.getElementById('kpi-capital').innerText = `R$ ${totalCapital.toFixed(2)}`;
+
+            const tbody = document.getElementById('expenses-table-body');
+            const allItems = [
+                ...mySales.map(s => ({ id: s.id, date: s.date, type: 'Venda (Receita)', desc: s.product + ' (' + s.qty + 'x)', val: s.total, isSale: true })),
+                ...myExpenses.map(e => ({ id: e.id, date: e.date, type: e.type, desc: e.desc, val: e.val, isSale: false }))
+            ].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            if(allItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Nenhum lançamento financeiro registrado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = allItems.map(item => `
+                <tr class="hover:bg-slate-gray">
+                    <td class="px-6 py-3 font-medium text-graphite">${item.date}</td>
+                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.isSale ? 'bg-slate-gray text-emerald-custom' : 'bg-amber-50 text-amber-700'}">${item.type}</span></td>
+                    <td class="px-6 py-3 text-graphite">${item.desc}</td>
+                    <td class="px-6 py-3 font-bold ${item.isSale ? 'text-tech-green' : 'text-rose-600'}">${item.isSale ? '+' : '-'} R$ ${item.val.toFixed(2)}</td>
+                    <td class="px-6 py-3 text-right">
+                        ${!item.isSale ? `<button onclick="deleteExpense('${item.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        let chart1Instance = null;
+        let chart2Instance = null;
+
+        function initCharts() {
+            const mySales = db.sales.filter(s => s.user === db.currentUser);
+            const myExpenses = db.expenses.filter(e => e.user === db.currentUser);
+
+            const totalReceita = mySales.reduce((acc, s) => acc + s.total, 0);
+            const totalCustos = myExpenses.filter(e => e.type === 'Custo').reduce((acc, e) => acc + e.val, 0);
+            const totalDespesas = myExpenses.filter(e => e.type === 'Despesa').reduce((acc, e) => acc + e.val, 0);
+
+            const ctx1 = document.getElementById('financeChart1').getContext('2d');
+            if(chart1Instance) chart1Instance.destroy();
+            chart1Instance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Receita Geral', 'Custos', 'Despesas'],
+                    datasets: [{
+                        label: 'Valores em R$',
+                        data: [totalReceita, totalCustos, totalDespesas],
+                        backgroundColor: ['#20C997', '#d97706', '#e11d48'],
+                        borderRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            const ctx2 = document.getElementById('financeChart2').getContext('2d');
+            if(chart2Instance) chart2Instance.destroy();
+            chart2Instance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Custos de Produtos', 'Despesas Operacionais'],
+                    datasets: [{
+                        data: [totalCustos, totalDespesas],
+                        backgroundColor: ['#d97706', '#e11d48'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        // --- CALENDAR & SALES ---
+        function handleSaleSubmit(e) {
+            e.preventDefault();
+            const date = document.getElementById('sale-date').value;
+            const productName = document.getElementById('sale-product').value;
+            const qty = parseInt(document.getElementById('sale-qty').value);
+            const total = parseFloat(document.getElementById('sale-total').value);
+            const desc = document.getElementById('sale-desc').value;
+
+            const prod = db.products.find(p => p.name === productName && p.user === db.currentUser);
+            if(prod) {
+                if(prod.stock < qty) {
+                    alert(`Estoque insuficiente! Restam apenas ${prod.stock} unidades de ${prod.name}.`);
+                    return;
+                }
+                prod.stock -= qty;
+            }
+
+            db.sales.push({ id: Date.now().toString(), user: db.currentUser, date, product: productName, qty, total, desc });
+            saveDB();
+            renderSales();
+            showToast('Venda registrada e estoque atualizado!');
+            e.target.reset();
+            document.getElementById('sale-date').valueAsDate = new Date();
+        }
+
+        function deleteSale(id) {
+            db.sales = db.sales.filter(s => s.id !== id);
+            saveDB();
+            renderSales();
+            showToast('Venda removida.');
+        }
+
+        function renderSales() {
+            const tbody = document.getElementById('sales-table-body');
+            const periodFilter = document.getElementById('sales-filter-period').value;
+            let mySales = db.sales.filter(s => s.user === db.currentUser);
+
+            if(periodFilter === 'mes') {
+                const currentMonth = new Date().toISOString().slice(0, 7);
+                mySales = mySales.filter(s => s.date.startsWith(currentMonth));
+            }
+
+            mySales.sort((a,b) => new Date(b.date) - new Date(a.date));
+            document.getElementById('sale-date').valueAsDate = new Date();
+
+            if(mySales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">Nenhuma venda encontrada.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = mySales.map(s => `
+                <tr class="hover:bg-slate-gray">
+                    <td class="px-6 py-3 font-medium text-graphite">${s.date}</td>
+                    <td class="px-6 py-3 text-graphite font-semibold">${s.product}</td>
+                    <td class="px-6 py-3 text-graphite">${s.qty}</td>
+                    <td class="px-6 py-3 font-bold text-tech-green">R$ ${s.total.toFixed(2)}</td>
+                    <td class="px-6 py-3 text-gray-500">${s.desc || '-'}</td>
+                    <td class="px-6 py-3 text-right">
+                        <button onclick="deleteSale('${s.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- CALCULATOR ---
+        let calcValue = '0';
+
+        function calcAppend(val) {
+            if(calcValue === '0' && !['+', '-', '*', '/', '%', '.'].includes(val)) {
+                calcValue = val;
+            } else {
+                calcValue += val;
+            }
+            document.getElementById('calc-screen').value = calcValue;
+        }
+
+        function calcClear() {
+            calcValue = '0';
+            document.getElementById('calc-screen').value = calcValue;
+        }
+
+        function calcCompute() {
+            try {
+                let expr = calcValue.replace(/%/g, '/100');
+                let res = eval(expr);
+                const operation = `${calcValue} = ${res}`;
+                calcValue = res.toString();
+                document.getElementById('calc-screen').value = calcValue;
+
+                db.calcHistory.unshift(operation);
+                if(db.calcHistory.length > 20) db.calcHistory.pop();
+                saveDB();
+                renderCalcHistory();
+            } catch(err) {
+                document.getElementById('calc-screen').value = 'Erro';
+                calcValue = '0';
+            }
+        }
+
+        function clearCalcHistory() {
+            db.calcHistory = [];
+            saveDB();
+            renderCalcHistory();
+        }
+
+        function renderCalcHistory() {
+            const list = document.getElementById('calc-history-list');
+            if(db.calcHistory.length === 0) {
+                list.innerHTML = `<p class="text-gray-400 text-center py-4">Nenhum cálculo recente.</p>`;
+                return;
+            }
+            list.innerHTML = db.calcHistory.map(item => `<div class="p-2 bg-slate-gray rounded-lg border border-gray-100">${item}</div>`).join('');
+        }
+
+        // --- SIMULATOR ---
+        function handleSimulation(e) {
+            e.preventDefault();
+            const capital = parseFloat(document.getElementById('sim-capital').value);
+            const custoUnit = parseFloat(document.getElementById('sim-custo-unit').value);
+            const embalagem = parseFloat(document.getElementById('sim-embalagem').value);
+            const despesas = parseFloat(document.getElementById('sim-despesas').value);
+            const qtdProduzir = parseInt(document.getElementById('sim-qtd-produzir').value);
+            const precoVenda = parseFloat(document.getElementById('sim-preco-venda').value);
+            const qtdVendas = parseInt(document.getElementById('sim-qtd-vendas').value);
+
+            const totalCustoUnitario = custoUnit + embalagem;
+            const investimentoNecessario = (totalCustoUnitario * qtdProduzir) + despesas;
+            const receitaProjetada = precoVenda * qtdVendas;
+            const custoTotalVendas = (totalCustoUnitario * qtdVendas) + despesas;
+            const lucroLiquido = receitaProjetada - custoTotalVendas;
+            const margemLucro = receitaProjetada > 0 ? (lucroLiquido / receitaProjetada) * 100 : 0;
+            
+            const margemContribuicaoUnit = precoVenda - totalCustoUnitario;
+            const breakEven = margemContribuicaoUnit > 0 ? Math.ceil(despesas / margemContribuicaoUnit) : 0;
+
+            document.getElementById('res-investimento').innerText = `R$ ${investimentoNecessario.toFixed(2)}`;
+            document.getElementById('res-custo-unit').innerText = `R$ ${totalCustoUnitario.toFixed(2)}`;
+            document.getElementById('res-receita').innerText = `R$ ${receitaProjetada.toFixed(2)}`;
+            
+            const resLucro = document.getElementById('res-lucro');
+            resLucro.innerText = `R$ ${lucroLiquido.toFixed(2)}`;
+            resLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-tech-green' : 'text-rose-600'}`;
+
+            document.getElementById('res-margem').innerText = `${margemLucro.toFixed(1)}%`;
+            document.getElementById('res-breakeven').innerText = `${breakEven} unidades`;
+
+            const resStatus = document.getElementById('res-status');
+            if(lucroLiquido > 0) {
+                resStatus.innerText = 'Altamente Viável';
+                resStatus.className = 'text-xl font-extrabold text-tech-green';
+            } else {
+                resStatus.innerText = 'Ajustar Preços / Custos';
+                resStatus.className = 'text-xl font-extrabold text-rose-600';
+            }
+
+            const otimistaQtd = Math.round(qtdVendas * 1.2);
+            const otimistaLucro = (precoVenda * otimistaQtd) - ((totalCustoUnitario * otimistaQtd) + despesas);
+
+            const moderadoQtd = qtdVendas;
+            const moderadoLucro = lucroLiquido;
+
+            const conservadorQtd = Math.round(qtdVendas * 0.8);
+            const conservadorLucro = (precoVenda * conservadorQtd) - ((totalCustoUnitario * conservadorQtd) + despesas);
+
+            document.getElementById('scenarios-grid').innerHTML = `
+                <div class="bg-slate-gray p-4 rounded-xl border border-gray-200">
+                    <h5 class="font-bold text-navy mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Otimista (+20%)</h5>
+                    <p class="text-xs text-graphite">Vendas: ${otimistaQtd} un.</p>
+                    <p class="text-sm font-extrabold text-emerald-custom mt-2">Lucro: R$ ${otimistaLucro.toFixed(2)}</p>
+                </div>
+                <div class="bg-slate-gray p-4 rounded-xl border border-gray-200">
+                    <h5 class="font-bold text-navy mb-1"><i class="fa-solid fa-scale-balanced mr-1"></i> Moderado (Esperado)</h5>
+                    <p class="text-xs text-graphite">Vendas: ${moderadoQtd} un.</p>
+                    <p class="text-sm font-extrabold text-tech-green mt-2">Lucro: R$ ${moderadoLucro.toFixed(2)}</p>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                    <h5 class="font-bold text-amber-800 mb-1"><i class="fa-solid fa-arrow-trend-down mr-1"></i> Conservador (-20%)</h5>
+                    <p class="text-xs text-graphite">Vendas: ${conservadorQtd} un.</p>
+                    <p class="text-sm font-extrabold text-amber-700 mt-2">Lucro: R$ ${conservadorLucro.toFixed(2)}</p>
+                </div>
+            `;
+
+            document.getElementById('sim-results').classList.remove('hidden');
+        }
+
+        // Inicialização
+        updateFavBadge();
+        renderCatalog();
+    </script>
 </body>
-                                                               </html>
-                                                               
+</html>
