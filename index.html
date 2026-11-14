@@ -37,7 +37,7 @@
         <!-- SIDEBAR (MENU LATERAL ESQUERDO) -->
         <aside class="w-full md:w-72 bg-navy text-white flex flex-col justify-between p-6 shadow-xl z-30 shrink-0">
             <div>
-                <!-- Logo & Nome (Lê logo.png com fallback) -->
+                <!-- Logo & Nome -->
                 <div class="flex items-center space-x-3 mb-8 cursor-pointer" onclick="switchTab('inicio')">
                     <div id="logo-container" class="w-12 h-12 rounded-2xl bg-emerald-custom flex items-center justify-center text-white text-xl font-black shadow-md overflow-hidden">
                         <img src="logo.png" alt="VB" class="w-full h-full object-cover" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
@@ -57,7 +57,7 @@
                     </button>
                     <button onclick="switchTab('chat')" id="nav-btn-chat" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
                         <i class="fa-solid fa-comments w-5"></i>
-                        <span>Chat Cliente / Vendedor</span>
+                        <span>Chat Geral / Negociação</span>
                     </button>
                     <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/80 hover:bg-white/5 hover:text-white transition-all text-left">
                         <i class="fa-solid fa-user-plus w-5"></i>
@@ -90,11 +90,11 @@
 
                 <!-- 1. SEÇÃO INÍCIO & CATÁLOGO -->
                 <section id="tab-inicio" class="space-y-8">
-                    <!-- Hero Banner Compacto e Otimizado para Celular -->
+                    <!-- Hero Banner -->
                     <div class="relative rounded-3xl bg-navy text-white p-6 sm:p-8 overflow-hidden shadow-xl space-y-4">
                         <span class="bg-emerald-custom/20 text-tech-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Várzea branca on-fire 🔥</span>
                         <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">TECNOLOGIA • EMPREENDEDORISMO • CONEXÃO</h2>
-                        <p class="text-slate-gray text-xs sm:text-sm leading-relaxed max-w-2xl">Divulgue seus produtos, conecte-se com clientes, gerencie suas finanças e simule o crescimento do seu empreendimento em um só lugar.</p>
+                        <p class="text-slate-gray text-xs sm:text-sm leading-relaxed max-w-2xl">Divulgue seus produtos, conecte-se com clientes via chat integrado, gerencie suas finanças e simule o crescimento do seu empreendimento.</p>
                     </div>
 
                     <!-- Filtros e Busca do Catálogo -->
@@ -123,7 +123,7 @@
                         </div>
                     </div>
 
-                    <!-- Grid de Produtos -->
+                    <!-- Grid de Produtos com Capa, Preço Próximo ao Chat e Responsivo -->
                     <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Injetado via JS -->
                     </div>
@@ -260,7 +260,7 @@
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos Totais</p>
                                 <h4 class="text-2xl font-extrabold text-amber-600" id="kpi-custos">R$ 0,00</h4>
                             </div>
-                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                            <div class="bg-white p-5 rounded-2xl border border-gray-border-gray-200 shadow-sm">
                                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas Operacionais</p>
                                 <h4 class="text-2xl font-extrabold text-rose-600" id="kpi-despesas">R$ 0,00</h4>
                             </div>
@@ -479,7 +479,7 @@
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Projetada</p>
-                                    <h4 class="text-2xl font-extrolt text-tech-green" id="res-receita">R$ 0,00</h4>
+                                    <h4 class="text-2xl font-extrob -extrabold text-tech-green" id="res-receita">R$ 0,00</h4>
                                 </div>
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro / Prejuízo</p>
@@ -717,7 +717,23 @@
             if(subId === 'calculadora') renderCalcHistory();
         }
 
-        // --- CHAT SYSTEM ---
+        // --- CHAT SYSTEM INTEGRADO ---
+        function openChatWithProduct(productName) {
+            switchTab('chat');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            db.chatMessages.push({
+                id: Date.now().toString(),
+                sender: 'Cliente',
+                text: `Olá! Tenho interesse no produto: *${productName}* visto no catálogo do VB-ON. Está disponível?`,
+                time: timeStr
+            });
+            saveDB();
+            renderChat();
+            showToast('Chat aberto com mensagem sobre o produto!');
+        }
+
         function switchChatSender() {
             renderChat();
         }
@@ -783,7 +799,7 @@
         // --- AUTH & PUBLIC REGISTER ---
         function checkAdminAccess() {
             if(!db.currentUser) {
-                switchTab('cadastro');
+                itchTab('cadastro');
                 showToast('Cadastre-se ou acesse com uma conta para gerenciar.');
             } else {
                 switchTab('painel');
@@ -798,7 +814,7 @@
             const pass = document.getElementById('reg-input-pass').value.trim();
 
             if(db.merchants.some(m => m.user === user)) {
-                alert('Este usuário já existe.  Escolha outro.');
+                alert('Este usuário já existe. Escolha outro.');
                 return;
             }
 
@@ -870,31 +886,42 @@
             grid.innerHTML = filtered.map(p => {
                 const isFav = db.favorites.includes(p.id);
                 const isOut = p.stock <= 0;
+                const imgSrc = p.img || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
                 return `
-                    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col relative">
+                    <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col relative">
                         <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-rose-500 shadow-md hover:scale-105 transition-all">
                             <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
                         </button>
+                        
+                        <div class="h-48 bg-slate-gray overflow-hidden relative">
+                            <img src="${imgSrc}" alt="${p.name}" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-bold px-3 py-1 rounded-full text-graphite">${p.cat}</span>
+                            ${isOut ? '<span class="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold uppercase tracking-wider text-sm">Esgotado</span>' : ''}
+                        </div>
+
                         <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
-                            <div>
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="font-bold text-graphite text-base line-clamp-1">${p.name}</h3>
-                                    <span class="font-extrabold text-emerald-custom text-lg">R$ ${p.price.toFixed(2)}</span>
-                                </div>
-                                <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+                            <div class="space-y-2">
+                                <h3 class="font-black text-graphite text-base line-clamp-1">${p.name}</h3>
+                                <p class="text-graphite text-xs line-clamp-2 leading-relaxed">${p.desc}</p>
+                                <div class="flex items-center justify-between text-xs text-gray-500 pt-1">
                                     <span><i class="fa-solid fa-location-dot mr-1 text-emerald-custom"></i> ${p.location}</span>
                                     <span class="${p.stock <= 3 && p.stock > 0 ? 'text-amber-600 font-bold' : ''}">Estoque: ${p.stock}</span>
                                 </div>
-                                <span class="inline-block bg-slate-gray text-xs font-bold px-2.5 py-1 rounded-full text-graphite mb-2">${p.cat}</span>
-                                <p class="text-graphite text-sm line-clamp-2">${p.desc}</p>
                             </div>
-                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                                <button onclick="shareProduct('${p.name}', ${p.price})" class="text-gray-500 hover:text-emerald-custom text-xs font-semibold flex items-center gap-1" title="Compartilhar">
-                                    <i class="fa-solid fa-share-nodes"></i> Compartilhar
-                                </button>
-                                <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="bg-emerald-custom text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 hover:opacity-95">
-                                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
-                                </a>
+
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
+                                <div>
+                                    <span class="text-[10px] uppercase font-bold text-gray-400 block">Preço</span>
+                                    <span class="font-extrabold text-emerald-custom text-xl">R$ ${p.price.toFixed(2)}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="shareProduct('${p.name}', ${p.price})" class="w-10 h-10 rounded-xl bg-slate-gray hover:bg-gray-200 text-graphite flex items-center justify-center text-xs transition-all" title="Compartilhar">
+                                        <i class="fa-solid fa-share-nodes"></i>
+                                    </button>
+                                    <button onclick="openChatWithProduct('${p.name}')" class="bg-emerald-custom text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all flex items-center gap-2">
+                                        <i class="fa-solid fa-comments"></i> Abrir Chat
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -912,7 +939,7 @@
             }
 
             grid.innerHTML = favProducts.map(p => `
-                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col relative p-5 justify-between space-y-4">
+                <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm flex flex-col relative p-5 justify-between space-y-4">
                     <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-slate-gray flex items-center justify-center text-rose-500 shadow-sm">
                         <i class="fa-solid fa-heart text-lg"></i>
                     </button>
@@ -921,9 +948,9 @@
                         <span class="font-extrabold text-emerald-custom text-lg">R$ ${p.price.toFixed(2)}</span>
                         <p class="text-graphite text-sm line-clamp-2 mt-2">${p.desc}</p>
                     </div>
-                    <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="w-full bg-emerald-custom text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Contatar pelo WhatsApp
-                    </a>
+                    <button onclick="openChatWithProduct('${p.name}')" class="w-full bg-emerald-custom text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95">
+                        <i class="fa-solid fa-comments"></i> Abrir Chat sobre o Produto
+                    </button>
                 </div>
             `).join('');
         }
@@ -1019,7 +1046,7 @@
             const location = document.getElementById('prod-location').value;
             const whatsapp = document.getElementById('prod-whatsapp').value;
             const desc = document.getElementById('prod-desc').value;
-            const img = currentImageBase64 || '';
+            const img = currentImageBase64 || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
 
             if(editId) {
                 const p = db.products.find(item => item.id === editId);
