@@ -3,169 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VB-ON — Várzea Branca On-Fire | Comércio Local & Gestão</title>
-    <!-- Tailwind CSS CDN -->
+    <title>VB-ON — Várzea Branca On-Fire</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome CDN -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js CDN -->
+    <!-- Chart.js para Gráficos Financeiros -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .gradient-brand {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        }
-        .gradient-hero {
-            background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-all duration-300 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm">
+        <i class="fa-solid fa-circle-check text-blue-400 text-lg"></i>
         <span id="toast-msg">Ação realizada com sucesso!</span>
     </div>
 
-    <!-- APP WRAPPER -->
+    <!-- WRAPPER PRINCIPAL -->
     <div class="flex flex-col md:flex-row flex-grow">
 
-        <!-- SIDEBAR / NAVIGATION -->
-        <aside id="sidebar" class="bg-white border-r border-gray-200 w-64 md:min-h-screen flex flex-col transition-all duration-300 z-40 fixed md:static inset-y-0 left-0 -translate-x-full md:translate-x-full md:translate-x-0 shadow-sm">
-            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl gradient-brand text-white flex items-center justify-center font-bold text-xl shadow-md">
-                        <i class="fa-solid fa-fire text-amber-300"></i>
+        <!-- SIDEBAR DE NAVEGAÇÃO -->
+        <aside id="sidebar" class="w-full md:w-64 bg-white border-r border-gray-200 flex flex-col transition-all duration-300 z-40 sticky top-0 md:h-screen">
+            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                    <div class="w-10 h-10 rounded-xl gradient-brand text-white flex items-center justify-center font-bold text-xl shadow-md shrink-0">
+                        <i class="fa-solid fa-bolt"></i>
                     </div>
                     <div class="sidebar-text">
                         <h1 class="font-extrabold text-gray-900 text-base leading-tight">VB-ON</h1>
-                        <p class="text-[10px] text-emerald-600 font-bold tracking-wider uppercase">Várzea Branca On-Fire</p>
+                        <p class="text-[11px] text-gray-500 font-medium">Várzea Branca</p>
                     </div>
                 </div>
-                <button onclick="toggleSidebarCollapse()" class="hidden md:flex text-gray-400 hover:text-gray-600 p-1">
+                <button onclick="toggleSidebarCollapse()" class="hidden md:flex text-gray-400 hover:text-gray-600 p-1 rounded-lg">
                     <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left text-sm"></i>
                 </button>
-                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 hover:text-gray-600 p-1">
+                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-500 hover:text-gray-700">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <!-- MENU LINKS -->
-            <nav class="p-4 space-y-1.5 flex-grow">
-                <button onclick="switchTab('inicio'); closeMobileSidebar();" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm bg-emerald-50 text-emerald-700 transition-all">
+            <!-- Legenda Inferior na Sidebar -->
+            <div class="px-6 py-2 bg-blue-50/50 border-b border-gray-100 sidebar-text">
+                <p class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Várzea Branca On-Fire</p>
+            </div>
+
+            <nav class="p-4 space-y-1.5 flex-grow overflow-y-auto">
+                <button onclick="switchTab('inicio'); closeMobileSidebar();" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-bold text-sm bg-blue-50 text-blue-700 transition-all">
                     <i class="fa-solid fa-house w-5 text-center"></i>
-                    <span class="sidebar-text">Início / Fortalecimento</span>
+                    <span class="sidebar-text">Início</span>
                 </button>
-                <button onclick="switchTab('catalogo'); closeMobileSidebar();" id="nav-btn-catalogo" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-50 transition-all">
+                <button onclick="switchTab('catalogo'); closeMobileSidebar();" id="nav-btn-catalogo" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100 transition-all">
                     <i class="fa-solid fa-store w-5 text-center"></i>
                     <span class="sidebar-text">Catálogo Local</span>
                 </button>
-                <button onclick="switchTab('favoritos'); closeMobileSidebar();" id="nav-btn-favoritos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-50 transition-all relative">
-                    <i class="fa-solid fa-heart w-5 text-center"></i>
-                    <span class="sidebar-text">Favoritos</span>
-                    <span id="fav-badge" class="ml-auto bg-rose-100 text-rose-700 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                <button onclick="switchTab('favoritos'); closeMobileSidebar();" id="nav-btn-favoritos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100 transition-all justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-heart w-5 text-center text-rose-500"></i>
+                        <span class="sidebar-text">Favoritos</span>
+                    </div>
+                    <span id="fav-badge" class="bg-rose-100 text-rose-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
                 </button>
-                <button onclick="checkAdminAccess(); closeMobileSidebar();" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-50 transition-all">
+                <button onclick="checkAdminAccess(); closeMobileSidebar();" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100 transition-all">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-                    <span class="sidebar-text">Painel do Comerciante</span>
+                    <span class="sidebar-text">Área do Comerciante</span>
                 </button>
             </nav>
 
-            <!-- FOOTER INFO IN SIDEBAR -->
-            <div class="p-4 border-t border-gray-100 sidebar-text">
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs text-gray-600 text-center">
-                    <p class="font-bold text-gray-800">Empreendedorismo Local</p>
-                    <p class="mt-0.5">Várzea Branca - PI</p>
-                </div>
+            <div class="p-4 border-t border-gray-200">
+                <button onclick="checkAdminAccess()" class="w-full gradient-brand text-white font-bold py-3 px-4 rounded-xl shadow-md hover:opacity-95 transition-all text-xs flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span class="sidebar-text">Entrar / Cadastrar Loja</span>
+                </button>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT CONTAINER -->
-        <main class="flex-grow flex flex-col min-w-0">
-            <!-- TOP BAR -->
-            <header class="bg-white border-b border-gray-200 h-16 px-6 flex items-center justify-between sticky top-0 z-30 shadow-xs">
-                <div class="flex items-center space-x-4">
-                    <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-700 text-lg">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <span class="font-extrabold text-gray-900 text-lg tracking-tight">Várzea Branca On-Fire (VB-ON)</span>
-                </div>
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="flex-grow p-4 sm:p-8 overflow-y-auto">
+            
+            <!-- HEADER MOBILE -->
+            <header class="flex md:hidden justify-between items-center mb-6 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
                 <div class="flex items-center space-x-3">
-                    <button onclick="checkAdminAccess()" class="gradient-brand text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs hover:opacity-95 transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-user-shield"></i> Área do Comerciante
-                    </button>
+                    <div class="w-9 h-9 rounded-xl gradient-brand text-white flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-extrabold text-gray-900 text-sm">VB-ON</h2>
+                        <p class="text-[10px] text-gray-500">Várzea Branca On-Fire</p>
+                    </div>
                 </div>
+                <button onclick="toggleMobileSidebar()" class="text-gray-600 p-2 rounded-xl bg-gray-100"><i class="fa-solid fa-bars"></i></button>
             </header>
 
-            <!-- TAB: INÍCIO / FORTALECIMENTO -->
-            <section id="tab-inicio" class="p-6 md:p-8 space-y-8 flex-grow">
-                <!-- HERO BANNER -->
-                <div class="gradient-hero rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
+            <!-- TAB: INÍCIO -->
+            <section id="tab-inicio" class="space-y-8">
+                <div class="gradient-brand rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
                     <div class="relative z-10 max-w-2xl space-y-4">
-                        <span class="bg-white/20 backdrop-blur-md text-emerald-100 text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider">Fortalecimento e Comércio Local</span>
-                        <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight">Várzea Branca On-Fire (VB-ON)</h2>
-                        <p class="text-emerald-100 text-sm md:text-base leading-relaxed">Impulsionando os negócios de Várzea Branca com tecnologia, vitrine digital, gestão financeira simplificada e conexão direta com clientes.</p>
+                        <span class="bg-white/20 backdrop-blur-md text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider">Comércio & Empreendedorismo</span>
+                        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight">Fortalecendo o Comércio de Várzea Branca</h2>
+                        <p class="text-blue-100 text-sm sm:text-base leading-relaxed">Conecte-se com clientes locais, gerencie seu estoque, registre vendas e controle suas finanças de forma simples e integrada.</p>
                         <div class="pt-2 flex flex-wrap gap-3">
-                            <button onclick="switchTab('catalogo')" class="bg-white text-emerald-900 font-bold px-6 py-3 rounded-xl shadow-md hover:bg-emerald-50 transition-all text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-store"></i> Explorar Catálogo
+                            <button onclick="switchTab('catalogo')" class="bg-white text-blue-700 font-bold px-6 py-3 rounded-xl shadow-md hover:bg-blue-50 transition-all text-sm">
+                                <i class="fa-solid fa-store mr-2"></i> Explorar Catálogo
                             </button>
-                            <button onclick="checkAdminAccess()" class="bg-emerald-700/80 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl backdrop-blur-md transition-all text-sm flex items-center gap-2 border border-white/20">
-                                <i class="fa-solid fa-chart-line"></i> Gerenciar Negócio
+                            <button onclick="checkAdminAccess()" class="bg-blue-800/60 hover:bg-blue-800/80 text-white font-bold px-6 py-3 rounded-xl backdrop-blur-md border border-white/20 transition-all text-sm">
+                                <i class="fa-solid fa-store-slash mr-2"></i> Sou Comerciante
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- CARDS DE DESTAQUE -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-start space-x-4">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
-                            <i class="fa-solid fa-bullhorn"></i>
-                        </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-bag-shopping"></i></div>
                         <div>
-                            <h3 class="font-bold text-gray-900 text-base">Vitrine Digital</h3>
-                            <p class="text-gray-500 text-xs mt-1">Exponha seus produtos e serviços para toda Várzea Branca com links diretos para o WhatsApp.</p>
+                            <h3 class="font-bold text-gray-900">Vitrine Virtual</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Divulgue seus produtos para toda a cidade.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-start space-x-4">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
-                            <i class="fa-solid fa-wallet"></i>
-                        </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-calculator"></i></div>
                         <div>
-                            <h3 class="font-bold text-gray-900 text-base">Gestão Financeira</h3>
-                            <p class="text-gray-500 text-xs mt-1">Controle custos, despesas, margens de lucro e exporte relatórios completos em segundos.</p>
+                            <h3 class="font-bold text-gray-900">Gestão Completa</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Calculadora, simuladores e fluxo de caixa.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-start space-x-4">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">
-                            <i class="fa-solid fa-calculator"></i>
-                        </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold"><i class="fa-brands fa-whatsapp"></i></div>
                         <div>
-                            <h3 class="font-bold text-gray-900 text-base">Simulador & Vendas</h3>
-                            <p class="text-gray-500 text-xs mt-1">Calcule o ponto de equilíbrio e registre vendas com baixa automática no seu estoque.</p>
+                            <h3 class="font-bold text-gray-900">Contato Direto</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Negocie direto pelo WhatsApp ou Chat integrado.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- TAB: CATÁLOGO -->
-            <section id="tab-catalogo" class="p-6 md:p-8 space-y-6 hidden flex-grow">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <section id="tab-catalogo" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-gray-900">Catálogo de Várzea Branca</h2>
-                        <p class="text-gray-500 text-xs mt-0.5">Encontre os melhores produtos e serviços locais</p>
+                        <h2 class="text-xl font-extrabold text-gray-900">Catálogo de Produtos Locais</h2>
+                        <p class="text-xs text-gray-500 mt-1">Encontre o que você precisa em Várzea Branca - PI</p>
                     </div>
-                    <div class="flex flex-wrap gap-3 w-full md:w-auto">
-                        <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Buscar produto..." class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 flex-grow md:w-64">
-                        <select id="catalog-category" onchange="renderCatalog()" class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-950">
-                            <option value="">Todas as Categorias</option>
+                    <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+                        <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Pesquisar produto..." class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900 flex-grow sm:w-64">
+                        <select id="catalog-category" onchange="renderCatalog()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-sm text-gray-900">
+                            <option value="">Todas Categorias</option>
                             <option value="Alimentação">Alimentação</option>
                             <option value="Vestuário">Vestuário</option>
                             <option value="Eletrônicos">Eletrônicos</option>
                             <option value="Serviços">Serviços</option>
                             <option value="Outros">Outros</option>
                         </select>
-                        <select id="catalog-sort" onchange="renderCatalog()" class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                        <select id="catalog-sort" onchange="renderCatalog()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-sm text-gray-900">
                             <option value="recentes">Mais Recentes</option>
                             <option value="menor-preco">Menor Preço</option>
                             <option value="maior-preco">Maior Preço</option>
@@ -173,95 +167,95 @@
                     </div>
                 </div>
 
-                <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Injetado via JS -->
                 </div>
             </section>
 
             <!-- TAB: FAVORITOS -->
-            <section id="tab-favoritos" class="p-6 md:p-8 space-y-6 hidden flex-grow">
+            <section id="tab-favoritos" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                    <h2 class="text-2xl font-extrabold text-gray-900">Seus Produtos Favoritos</h2>
-                    <p class="text-gray-500 text-xs mt-0.5">Acesse rapidamente os itens que você salvou</p>
+                    <h2 class="text-xl font-extrabold text-gray-900">Meus Produtos Favoritos</h2>
+                    <p class="text-xs text-gray-500 mt-1">Acesse rapidamente os itens que você salvou</p>
                 </div>
-                <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Injetado via JS -->
                 </div>
             </section>
 
-            <!-- TAB: PAINEL DO COMERCIANTE -->
-            <section id="tab-painel" class="p-6 md:p-8 space-y-6 hidden flex-grow">
-                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <!-- TAB: ÁREA DO COMERCIANTE (PAINEL) -->
+            <section id="tab-painel" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-gray-900" id="merchant-welcome-name">Painel do Comerciante</h2>
-                        <p class="text-gray-500 text-xs mt-0.5">Gerencie seu estoque, finanças e vendas em Várzea Branca</p>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Painel Administrativo</span>
+                        <h2 class="text-xl font-extrabold text-gray-900 mt-0.5" id="merchant-welcome-name">Painel do Comerciante</h2>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="openProfileModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-xl transition-all"><i class="fa-solid fa-gear mr-1"></i> Configurações</button>
-                        <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold px-4 py-2 rounded-xl transition-all"><i class="fa-solid fa-right-from-bracket mr-1"></i> Sair</button>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openProfileModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2.5 rounded-xl"><i class="fa-solid fa-gear mr-1"></i> Configurações</button>
+                        <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold px-4 py-2.5 rounded-xl"><i class="fa-solid fa-right-from-bracket mr-1"></i> Sair</button>
                     </div>
                 </div>
 
-                <!-- SUBTABS NAVIGATION -->
-                <div class="flex overflow-x-auto gap-2 bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
-                    <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn px-5 py-2.5 rounded-xl font-bold text-xs gradient-brand text-white shadow-sm whitespace-nowrap transition-all"><i class="fa-solid fa-box mr-1.5"></i> Produtos & Estoque</button>
-                    <button onclick="switchSubTab('mensagens')" id="subtab-btn-mensagens" class="subtab-btn px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap transition-all"><i class="fa-solid fa-comments mr-1.5"></i> Mensagens / Chat</button>
-                    <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap transition-all"><i class="fa-solid fa-wallet mr-1.5"></i> Gestão Financeira</button>
-                    <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap transition-all"><i class="fa-solid fa-cart-shopping mr-1.5"></i> Registro de Vendas</button>
-                    <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap transition-all"><i class="fa-solid fa-calculator mr-1.5"></i> Calculadora</button>
-                    <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-gray-600 hover:bg-gray-50 whitespace-nowrap transition-all"><i class="fa-solid fa-chart-line mr-1.5"></i> Simulador</button>
+                <!-- SUBTABS DO PAINEL -->
+                <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
+                    <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn gradient-brand text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all"><i class="fa-solid fa-boxes-stacked mr-1.5"></i> Meus Produtos</button>
+                    <button onclick="switchSubTab('mensagens')" id="subtab-btn-mensagens" class="subtab-btn bg-white text-gray-600 font-semibold text-xs px-5 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-comments mr-1.5"></i> Mensagens no Chat</button>
+                    <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn bg-white text-gray-600 font-semibold text-xs px-5 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-wallet mr-1.5"></i> Fluxo Financeiro</button>
+                    <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn bg-white text-gray-600 font-semibold text-xs px-5 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-cart-plus mr-1.5"></i> Registro de Vendas</button>
+                    <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn bg-white text-gray-600 font-semibold text-xs px-5 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-calculator mr-1.5"></i> Calculadora</button>
+                    <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn bg-white text-gray-600 font-semibold text-xs px-5 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"><i class="fa-solid fa-chart-line mr-1.5"></i> Simulador</button>
                 </div>
 
-                <!-- SUBTAB: PRODUTOS & ESTOQUE -->
+                <!-- SUBTAB: PRODUTOS -->
                 <div id="subtab-produtos" class="space-y-6">
-                    <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-gray-900">Seus Produtos Cadastrados</h3>
-                        <button onclick="openProductModal()" class="gradient-brand text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all"><i class="fa-solid fa-plus mr-1.5"></i> Novo Produto</button>
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-900">Gerenciamento de Produtos & Estoque</h3>
+                        <button onclick="openProductModal()" class="gradient-brand text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all"><i class="fa-solid fa-plus mr-1"></i> Novo Produto</button>
                     </div>
-                    <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Injetado via JS -->
                     </div>
                 </div>
 
-                <!-- SUBTAB: MENSAGENS / CHAT -->
+                <!-- SUBTAB: MENSAGENS -->
                 <div id="subtab-mensagens" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">Mensagens Recebidas de Clientes</h3>
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Central de Mensagens</h3>
+                        <p class="text-xs text-gray-500 mb-6">Acompanhe e responda às dúvidas dos clientes sobre seus produtos.</p>
                         <div id="merchant-messages-list" class="space-y-4">
                             <!-- Injetado via JS -->
                         </div>
                     </div>
                 </div>
 
-                <!-- SUBTAB: GESTÃO FINANCEIRA -->
+                <!-- SUBTAB: FINANCEIRO -->
                 <div id="subtab-financeiro" class="hidden space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                         <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Geral</p>
-                            <h4 class="text-2xl font-extrabold text-blue-600" id="kpi-receita">R$ 0,00</h4>
+                            <h4 class="text-2xl font-extrabold text-emerald-600" id="kpi-receita">R$ 0,00</h4>
                         </div>
                         <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos Diretos</p>
                             <h4 class="text-2xl font-extrabold text-amber-600" id="kpi-custos">R$ 0,00</h4>
                         </div>
                         <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas Operacionais</p>
                             <h4 class="text-2xl font-extrabold text-rose-600" id="kpi-despesas">R$ 0,00</h4>
                         </div>
                         <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro Líquido</p>
-                            <h4 class="text-2xl font-extrabold text-emerald-600" id="kpi-lucro">R$ 0,00</h4>
+                            <h4 class="text-2xl font-extrabold" id="kpi-lucro">R$ 0,00</h4>
                         </div>
                         <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Capital Inicial</p>
-                            <h4 class="text-2xl font-extrabold text-purple-600" id="kpi-capital">R$ 0,00</h4>
+                            <h4 class="text-2xl font-extrabold text-blue-600" id="kpi-capital">R$ 0,00</h4>
                         </div>
                     </div>
 
-                    <!-- GRÁFICOS -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-80 flex flex-col">
-                            <h4 class="font-bold text-gray-900 mb-4 text-sm">Resumo de Movimentações</h4>
+                            <h4 class="font-bold text-gray-900 mb-4 text-sm">Resumo Financeiro</h4>
                             <div class="flex-grow relative">
                                 <canvas id="financeChart1"></canvas>
                             </div>
@@ -274,7 +268,6 @@
                         </div>
                     </div>
 
-                    <!-- TABELA DE LANÇAMENTOS -->
                     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <span class="font-bold text-gray-900">Histórico de Lançamentos</span>
@@ -501,8 +494,8 @@
         <!-- FOOTER -->
         <footer class="bg-white border-t border-gray-200 mt-12 py-8 text-center text-sm text-gray-500">
             <div class="max-w-7xl mx-auto px-4">
-                <p class="font-bold text-gray-700">VB-ON — Várzea Branca On-Fire</p>
-                <p class="mt-1">Plataforma de Comércio Local e Gestão Financeira para Empreendedores.</p>
+                <p class="font-bold text-gray-700">VB-ON — Várzea Branca</p>
+                <p class="mt-1">Várzea Branca On-Fire — Plataforma de Comércio Local e Gestão Financeira.</p>
             </div>
         </footer>
     </div>
@@ -521,14 +514,12 @@
                 </div>
             </div>
 
-            <!-- Chat Messages Container -->
-            <div id="chat-messages-container" class="flex-grow overflow-y-auto py-4 space-y-3 px-2">
+            <div id="chat-messages-container" class="flex-grow overflow-y-auto py-4 space-y-3 py-4 space-y-3 px-2">
                 <!-- Injetado via JS -->
             </div>
 
-            <!-- Chat Input -->
             <form onsubmit="handleSendMessage(event)" class="pt-3 border-t border-gray-100 flex gap-2">
-                <input type="text" id="chat-input-msg" placeholder="Digite sua mensagem para o vendedor..." required class="flex-grow bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900">
+                <input type="text" id="chat-input-msg" placeholder="Digite sua mensagem..." required class="flex-grow bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
                 <button type="submit" class="gradient-brand text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:opacity-95 transition-all">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
@@ -565,7 +556,7 @@
             </form>
 
             <div class="mt-6 text-center">
-                <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs font-semibold text-emerald-600 hover:underline">Não tem conta? Cadastre-se agora</button>
+                <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs font-semibold text-blue-600 hover:underline">Não tem conta? Cadastre-se agora</button>
             </div>
         </div>
     </div>
@@ -582,7 +573,8 @@
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Produto</label>
                         <input type="text" id="prod-name" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
-                    </div><div>
+                    </div>
+                    <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Categoria</label>
                         <select id="prod-cat" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                             <option value="Alimentação">Alimentação</option>
@@ -687,7 +679,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        let db = JSON.parse(localStorage.getItem('conecta_vbon_db_v4')) || {
+        let db = JSON.parse(localStorage.getItem('conecta_vbon_db_v5')) || {
             currentUser: null,
             isAuthModeRegister: false,
             sidebarCollapsed: false,
@@ -717,7 +709,7 @@
         let activeChatProductId = null;
 
         function saveDB() {
-            localStorage.setItem('conecta_vbon_db_v4', JSON.stringify(db));
+            localStorage.setItem('conecta_vbon_db_v5', JSON.stringify(db));
         }
 
         function showToast(msg) {
@@ -771,12 +763,12 @@
             if(targetTab) targetTab.classList.remove('hidden');
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-emerald-50', 'text-emerald-700');
+                btn.classList.remove('bg-blue-50', 'text-blue-700');
                 btn.classList.add('text-gray-600');
             });
             const activeBtn = document.getElementById('nav-btn-' + tabId);
             if(activeBtn) {
-                activeBtn.classList.add('bg-emerald-50', 'text-emerald-700');
+                activeBtn.classList.add('bg-blue-50', 'text-blue-700');
                 activeBtn.classList.remove('text-gray-600');
             }
 
@@ -795,12 +787,12 @@
 
             document.querySelectorAll('.subtab-btn').forEach(btn => {
                 btn.classList.remove('gradient-brand', 'text-white', 'shadow-sm');
-                btn.classList.add('bg-white', 'text-gray-600');
+                btn.classList.add('bg-white', 'text-gray-600', 'border', 'border-gray-200');
             });
             const activeBtn = document.getElementById('subtab-btn-' + subId);
             if(activeBtn) {
                 activeBtn.classList.add('gradient-brand', 'text-white', 'shadow-sm');
-                activeBtn.classList.remove('bg-white', 'text-gray-600');
+                activeBtn.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
             }
 
             if(subId === 'produtos') renderMerchantProducts();
@@ -836,22 +828,25 @@
             const chatMsgs = db.messages.filter(m => m.productId === activeChatProductId);
 
             if(chatMsgs.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 text-gray-400 text-xs"><p>Nenhuma mensagem ainda. Inicie a conversa com o vendedor!</p></div>`;
+                container.innerHTML = `<div class="text-center py-12 text-gray-400 text-xs"><p>Nenhuma mensagem ainda. Inicie a conversa!</p></div>`;
                 return;
             }
 
-            container.innerHTML = chatMsgs.map(m => `
-                <div class="flex flex-col ${m.isisMerchant ? 'items-end' : 'items-start'}">
-                    <div class="max-w-[80%] rounded-2xl px-4 py-3 text-sm ${m.isMerchant ? 'bg-emerald-600 text-white rounded-br-none' : 'bg-gray-100 text-gray-800 rounded-bl-none'}">
-                        <p class="text-[10px] font-bold opacity-75 mb-0.5">${m.sender}</p>
-                        <p>${m.text}</p>
+            container.innerHTML = chatMsgs.map(m => {
+                const isSenderLeft = !m.isMerchant; 
+                return `
+                    <div class="flex flex-col ${isSenderLeft ? 'items-start' : 'items-end'}">
+                        <div class="max-w-[80%] rounded-2xl px-4 py-3 text-sm ${isSenderLeft ? 'bg-gray-100 text-gray-800 rounded-bl-none' : 'bg-blue-600 text-white rounded-br-none'}">
+                            <p class="text-[10px] font-bold opacity-75 mb-0.5">${m.sender}</p>
+                            <p>${m.text}</p>
+                        </div>
+                        <div class="flex items-center space-x-2 mt-1 text-[10px] text-gray-400">
+                            <span>${m.time}</span>
+                            <button onclick="deleteMessage('${m.id}')" class="hover:text-rose-600" title="Apagar"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-2 mt-1 text-[10px] text-gray-400">
-                        <span>${m.time}</span>
-                        <button onclick="deleteMessage('${m.id}')" class="hover:text-rose-600" title="Apagar"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             container.scrollTop = container.scrollHeight;
         }
 
@@ -922,7 +917,7 @@
                                 <img src="${prod ? prod.img : ''}" class="w-10 h-10 rounded-xl object-cover">
                                 <div>
                                     <h4 class="font-bold text-gray-900 text-sm">${prod ? prod.name : 'Produto'}</h4>
-                                    <span class="text-xs text-emerald-600 font-extrabold">R$ ${prod ? prod.price.toFixed(2) : '0,00'}</span>
+                                    <span class="text-xs text-blue-600 font-extrabold">R$ ${prod ? prod.price.toFixed(2) : '0,00'}</span>
                                 </div>
                             </div>
                             <button onclick="openChatModal('${prodId}')" class="gradient-brand text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs">
@@ -934,7 +929,7 @@
                                 <div class="bg-white p-3 rounded-xl border border-gray-100 flex items-start justify-between gap-4">
                                     <div>
                                         <div class="flex items-center space-x-2 mb-1">
-                                            <span class="text-xs font-bold ${m.isMerchant ? 'text-emerald-600' : 'text-blue-600'}">${m.sender}</span>
+                                            <span class="text-xs font-bold ${m.isMerchant ? 'text-blue-600' : 'text-gray-700'}">${m.sender}</span>
                                             <span class="text-[10px] text-gray-400"><i class="fa-regular fa-clock mr-1"></i>${m.time}</span>
                                         </div>
                                         <p class="text-sm text-gray-700">${m.text}</p>
@@ -1046,7 +1041,7 @@
         }
 
         function shareProduct(name, price) {
-            const text = `Confira este produto incrível em Várzea Branca On-Fire: *${name}* por apenas R$ ${price.toFixed(2)} no VB-ON!`;
+            const text = `Confira este produto incrível em Várzea Branca (VB-ON): *${name}* por apenas R$ ${price.toFixed(2)}!`;
             if(navigator.share) {
                 navigator.share({ title: 'VB-ON', text: text, url: window.location.href }).catch(() => {});
             } else {
@@ -1097,20 +1092,20 @@
                             <div>
                                 <div class="flex justify-between items-start mb-1">
                                     <h3 class="font-bold text-gray-900 text-base line-clamp-1">${p.name}</h3>
-                                    <span class="font-extrabold text-emerald-600 text-lg">R$ ${p.price.toFixed(2)}</span>
+                                    <span class="font-extrabold text-blue-600 text-lg">R$ ${p.price.toFixed(2)}</span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
-                                    <span><i class="fa-solid fa-location-dot mr-1 text-emerald-600"></i> ${p.location}</span>
+                                    <span><i class="fa-solid fa-location-dot mr-1 text-blue-600"></i> ${p.location}</span>
                                     <span class="${p.stock <= 3 && p.stock > 0 ? 'text-amber-600 font-bold' : ''}">Estoque: ${p.stock}</span>
                                 </div>
                                 <p class="text-gray-600 text-sm line-clamp-2">${p.desc}</p>
                             </div>
                             <div class="space-y-2 pt-3 border-t border-gray-100">
                                 <div class="flex items-center justify-between">
-                                    <button onclick="shareProduct('${p.name}', ${p.price})" class="text-gray-500 hover:text-emerald-600 text-xs font-semibold flex items-center gap-1">
+                                    <button onclick="shareProduct('${p.name}', ${p.price})" class="text-gray-500 hover:text-blue-600 text-xs font-semibold flex items-center gap-1">
                                         <i class="fa-solid fa-share-nodes"></i> Compartilhar
                                     </button>
-                                    <button onclick="openChatModal('${p.id}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                                    <button onclick="openChatModal('${p.id}')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
                                         <i class="fa-solid fa-comments"></i> Abrir Chat
                                     </button>
                                 </div>
@@ -1145,11 +1140,11 @@
                     <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
                         <div>
                             <h3 class="font-bold text-gray-900 text-base">${p.name}</h3>
-                            <span class="font-extrabold text-emerald-600 text-lg">R$ ${p.price.toFixed(2)}</span>
+                            <span class="font-extrabold text-blue-600 text-lg">R$ ${p.price.toFixed(2)}</span>
                             <p class="text-gray-600 text-sm line-clamp-2 mt-2">${p.desc}</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="openChatModal('${p.id}')" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                            <button onclick="openChatModal('${p.id}')" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-comments"></i> Chat
                             </button>
                             <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="flex-1 gradient-brand text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95 shadow-xs">
@@ -1198,14 +1193,14 @@
                     <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
                         <div>
                             <h4 class="font-bold text-gray-900">${p.name}</h4>
-                                    <div class="flex justify-between items-center mt-1">
-                                <span class="text-emerald-600 font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-blue-600 font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
                                 <span class="text-xs px-2 py-0.5 rounded-md font-bold ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'}">Estoque: ${p.stock} un.</span>
                             </div>
                             <p class="text-gray-500 text-xs line-clamp-2 mt-1">${p.desc}</p>
                         </div>
                         <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
-                            <button onclick="editProduct('${p.id}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
+                            <button onclick="editProduct('${p.id}')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
                             <button onclick="deleteProduct('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash mr-1"></i> Excluir</button>
                         </div>
                     </div>
@@ -1352,7 +1347,7 @@
             const totalDespesas = myExpenses.filter(e => e.type === 'Despesa').reduce((acc, e) => acc + e.val, 0);
             const lucro = totalReceita - (totalCustos + totalDespesas);
 
-            let content = `VB-ON - RELATÓRIO FINANCEIRO (VÁRZEA BRANCA)\n================================================\n\n`;
+            let content = `VB-ON (VÁRZEA BRANCA) - RELATÓRIO FINANCEIRO\n================================================\n\n`;
             content += `Receita Geral: R$ ${totalReceita.toFixed(2)}\n`;
             content += `Custos: R$ ${totalCustos.toFixed(2)}\n`;
             content += `Despesas: R$ ${totalDespesas.toFixed(2)}\n`;
@@ -1407,7 +1402,7 @@
             tbody.innerHTML = allItems.map(item => `
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-3 font-medium text-gray-900">${item.date}</td>
-                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.isSale ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${item.type}</span></td>
+                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.isSale ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}">${item.type}</span></td>
                     <td class="px-6 py-3 text-gray-600">${item.desc}</td>
                     <td class="px-6 py-3 font-bold ${item.isSale ? 'text-emerald-600' : 'text-rose-600'}">${item.isSale ? '+' : '-'} R$ ${item.val.toFixed(2)}</td>
                     <td class="px-6 py-3 text-right">
@@ -1435,7 +1430,7 @@
                     type: 'bar',
                     data: {
                         labels: ['Receita Geral', 'Custos', 'Despesas'],
-                        datasets: [{ label: 'Valores em R$', data: [totalReceita, totalCustos, totalDespesas], backgroundColor: ['#059669', '#d97706', '#e11d48'], borderRadius: 12 }]
+                        datasets: [{ label: 'Valores em R$', data: [totalReceita, totalCustos, totalDespesas], backgroundColor: ['#2563eb', '#d97706', '#e11d48'], borderRadius: 12 }]
                     },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
                 });
@@ -1615,10 +1610,10 @@
             const scenariosGrid = document.getElementById('scenarios-grid');
             if(scenariosGrid) {
                 scenariosGrid.innerHTML = `
-                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                        <h5 class="font-bold text-emerald-800 mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Otimista (+20%)</h5>
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <h5 class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Otimista (+20%)</h5>
                         <p class="text-xs text-gray-600">Vendas: ${otimistaQtd} un.</p>
-                        <p class="text-sm font-extrabold text-emerald-700 mt-2">Lucro: R$ ${otimistaLucro.toFixed(2)}</p>
+                        <p class="text-sm font-extrabold text-blue-700 mt-2">Lucro: R$ ${otimistaLucro.toFixed(2)}</p>
                     </div>
                     <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
                         <h5 class="font-bold text-indigo-800 mb-1"><i class="fa-solid fa-scale-balanced mr-1"></i> Moderado (Esperado)</h5>
