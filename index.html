@@ -3,591 +3,588 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VB-ON — Várzea Branca Conectada</title>
+    <title>VB-ON — Várzea Branca On-Fire</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js para o Financeiro -->
+    <!-- Chart.js para o Painel Financeiro -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'verde-esmeralda': '#20C957',
-                        'verde-intenso': '#10963D',
-                        'verde-limao': '#70E000',
-                        'grafite': '#1E293B',
-                        'roxo-profundo': '#3B0764',
-                        'slate-gray': '#F1F5F9'
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        .gradient-cet {
-            background: linear-gradient(135deg, #3B0764 0%, #10963D 100%);
+        .gradient-brand {
+            background: linear-gradient(135deg, #2563eb 0%, #059669 100%);
         }
-        .gradient-header {
-            background: linear-gradient(135deg, #1E293B 0%, #3B0764 100%);
+        .text-gradient {
+            background: linear-gradient(135deg, #2563eb 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        /* Custom scrollbar para mobile */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F1F5F9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+        .sidebar-transition {
+            transition: width 0.3s ease, transform 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-slate-gray font-sans text-graphite antialiased min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col md:flex-row">
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300 bg-graphite text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm">
-        <i class="fa-solid fa-circle-check text-verde-esmeralda text-lg"></i>
-        <span id="toast-msg">Ação realizada com sucesso!</span>
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300">
+        <div class="bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+            <span id="toast-msg">Ação realizada com sucesso!</span>
+        </div>
     </div>
 
-    <!-- WRAPPER PRINCIPAL -->
-    <div class="flex flex-col lg:flex-row flex-grow min-h-screen">
-
-        <!-- SIDEBAR / MENU LATERAL (Responsivo para Mobile & Desktop) -->
-        <aside id="sidebar" class="bg-gradient-to-b from-grafite to-roxo-profundo text-white w-full lg:w-64 transition-all duration-300 flex flex-col justify-between shadow-xl z-30">
-            <div class="p-5 flex flex-col space-y-6">
-                <!-- Topo da Sidebar -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-2xl bg-verde-esmeralda flex items-center justify-center font-black text-white shadow-lg text-lg">VB</div>
-                        <div id="sidebar-brand">
-                            <h1 class="font-extrabold text-base tracking-wide">VB-ON</h1>
-                            <p class="text-[10px] text-verde-limao font-semibold">CETI José Marques</p>
-                        </div>
+    <!-- SIDEBAR (MENU LATERAL) -->
+    <aside id="sidebar" class="bg-white border-r border-gray-200 w-64 md:translate-x-0 fixed md:static inset-y-0 left-0 z-50 flex flex-col justify-between sidebar-transition shadow-sm md:shadow-none transform -translate-x-full">
+        <div>
+            <!-- Sidebar Header -->
+            <div class="p-6 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center space-x-3 cursor-pointer overflow-hidden" onclick="switchTab('inicio')">
+                    <div class="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center text-white text-lg font-black shadow-md shrink-0">
+                        VB
                     </div>
-                    <!-- Botão de Recolher (Apenas Desktop) -->
-                    <button onclick="toggleSidebar()" class="hidden lg:flex text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-all">
-                        <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left text-sm"></i>
-                    </button>
-                </div>
-
-                <!-- Navegação -->
-                <nav class="space-y-1.5">
-                    <button onclick="switchTab('inicio')" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 text-verde-limao font-semibold text-sm transition-all shadow-sm">
-                        <i class="fa-solid fa-store w-5 text-center"></i>
-                        <span class="sidebar-text">Catálogo & Vitrine</span>
-                    </button>
-                    <button onclick="switchTab('favoritos')" id="nav-btn-favoritos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-medium text-sm transition-all">
-                        <i class="fa-solid fa-heart w-5 text-center text-rose-400"></i>
-                        <span class="sidebar-text">Favoritos</span>
-                        <span id="fav-badge" class="ml-auto bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
-                    </button>
-                    <button onclick="checkAdminAccess()" id="nav-btn-painel" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-medium text-sm transition-all">
-                        <i class="fa-solid fa-chart-pie w-5 text-center text-verde-limao"></i>
-                        <span class="sidebar-text">Painel do Comerciante</span>
-                    </button>
-                    <button onclick="switchTab('cadastro')" id="nav-btn-cadastro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white font-medium text-sm transition-all">
-                        <i class="fa-solid fa-user-plus w-5 text-center text-amber-400"></i>
-                        <span class="sidebar-text">Cadastrar Negócio</span>
-                    </button>
-                </nav>
-            </div>
-
-            <!-- Rodapé da Sidebar -->
-            <div class="p-4 border-t border-white/10 hidden lg:block">
-                <div class="bg-white/5 p-3 rounded-xl text-xs space-y-1">
-                    <p class="font-bold text-verde-limao">Várzea Branca - PI</p>
-                    <p class="text-white/60 text-[11px]">Tecnologia & Empreendedorismo Estudantil</p>
-                </div>
-            </div>
-        </aside>
-
-        <!-- CONTEÚDO PRINCIPAL -->
-        <main class="flex-grow flex flex-col min-w-0">
-            <!-- HEADER SUPERIOR -->
-            <header class="bg-white border-b border-gray-200 px-4 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 sticky top-0 z-20 shadow-xs">
-                <div>
-                    <h2 class="text-lg sm:text-xl font-black text-graphite">Plataforma VB-ON</h2>
-                    <p class="text-xs text-gray-500">Conectando o comércio local e impulsionando jovens empreendedores</p>
-                </div>
-                <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                    <div id="auth-status-bar" class="flex items-center gap-2">
-                        <!-- Injetado dinamicamente via JS -->
+                    <div class="sidebar-text">
+                        <h1 class="font-black text-lg tracking-tight text-gray-900 leading-none">VB-<span class="text-gradient">ON</span></h1>
+                        <p class="text-[10px] text-gray-400 font-semibold mt-0.5">Várzea Branca On-Fire</p>
                     </div>
                 </div>
-            </header>
-
-            <!-- CONTAINER DAS ABAS -->
-            <div class="p-4 sm:p-8 flex-grow max-w-7xl w-full mx-auto">
-
-                <!-- TAB: INÍCIO / CATÁLOGO PÚBLICO -->
-                <section id="tab-inicio" class="space-y-6">
-                    <!-- Banner de Boas-Vindas -->
-                    <div class="gradient-header rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div class="space-y-3 z-10 text-center md:text-left">
-                            <span class="bg-verde-esmeralda/30 text-verde-limao text-xs font-bold px-3 py-1 rounded-full border border-verde-esmeralda/40">Inovação CETI José Marques</span>
-                            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Compre Local em Várzea Branca 🔥</h2>
-                            <p class="text-sm text-gray-300 max-w-xl">Descubra produtos artesanais, alimentos, roupas e serviços direto dos empreendedores da nossa cidade via WhatsApp com segurança e agilidade.</p>
-                        </div>
-                        <div class="z-10 flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                            <button onclick="checkAdminAccess()" class="gradient-cet text-white font-bold px-6 py-3 rounded-2xl shadow-md hover:opacity-90 transition-all text-sm flex items-center justify-center gap-2 border border-white/20">
-                                <i class="fa-solid fa-store"></i> Acessar Meu Painel
-                            </button>
-                        </div>
-                        <!-- Círculos decorativos de fundo -->
-                        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-verde-esmeralda/20 rounded-full blur-2xl"></div>
-                    </div>
-
-                    <!-- Filtros e Busca -->
-                    <div class="bg-white p-4 sm:p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col lg:flex-row items-center gap-4">
-                        <div class="relative w-full lg:flex-grow">
-                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Buscar por produto, descrição ou categoria..." class="w-full bg-slate-gray border border-gray-300 rounded-2xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                        </div>
-                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-                            <select id="catalog-category" onchange="renderCatalog()" class="w-full sm:w-48 bg-slate-gray border border-gray-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite font-medium">
-                                <option value="">Todas Categorias</option>
-                                <option value="Alimentação">Alimentação</option>
-                                <option value="Vestuário">Vestuário</option>
-                                <option value="Eletrônicos">Eletrônicos</option>
-                                <option value="Serviços">Serviços</option>
-                                <option value="Outros">Outros</option>
-                            </select>
-                            <select id="catalog-sort" onchange="renderCatalog()" class="w-full sm:w-48 bg-slate-gray border border-gray-300 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite font-medium">
-                                <option value="recentes">Mais Recentes</option>
-                                <option value="menor-preco">Menor Preço</option>
-                                <option value="maior-preco">Maior Preço</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Grid de Produtos -->
-                    <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Injetado via JS -->
-                    </div>
-                </section>
-
-                <!-- TAB: FAVORITOS -->
-                <section id="tab-favoritos" class="hidden space-y-6">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xl font-extrabold text-graphite">Meus Produtos Favoritos</h3>
-                    </div>
-                    <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Injetado via JS -->
-                    </div>
-                </section>
-
-                <!-- TAB: CADASTRO DE NOVO NEGÓCIO -->
-                <section id="tab-cadastro" class="hidden space-y-6 max-w-xl mx-auto">
-                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-xl">
-                        <div class="text-center mb-6">
-                            <div class="w-12 h-12 bg-emerald-100 text-verde-intenso rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
-                                <i class="fa-solid fa-store"></i>
-                            </div>
-                            <h3 class="text-xl font-extrabold text-graphite">Cadastre seu Negócio no VB-ON</h3>
-                            <p class="text-xs text-gray-500 mt-1">Crie sua conta para gerenciar produtos, estoque e financeiro</p>
-                        </div>
-                        <form onsubmit="handlePublicRegister(event)" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Negócio / Loja</label>
-                                <input type="text" id="reg-input-name" required placeholder="Ex: Doces da Dona Maria" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nome de Usuário (Login)</label>
-                                <input type="text" id="reg-input-user" required placeholder="Ex: maria123" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Senha de Acesso</label>
-                                <input type="password" id="reg-input-pass" required placeholder="••••••••" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                            </div>
-                            <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Criar Conta e Entrar</button>
-                        </form>
-                    </div>
-                </section>
-
-                <!-- TAB: PAINEL DO COMERCIANTE (DASHBOARD) -->
-                <section id="tab-painel" class="hidden space-y-6">
-                    <!-- Top Bar do Painel -->
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
-                        <div>
-                            <span class="text-xs font-bold text-verde-intenso uppercase tracking-wider">Painel Administrativo</span>
-                            <h3 class="text-xl font-black text-graphite" id="merchant-welcome-name">Bem-vindo ao Painel</h3>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="openProfileModal()" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-gear"></i> Configurações
-                            </button>
-                            <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-right-from-bracket"></i> Sair
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Subnav do Painel -->
-                    <div class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
-                        <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-verde-esmeralda text-white shadow-sm">
-                            <i class="fa-solid fa-boxes-stacked mr-1.5"></i> Produtos & Estoque
-                        </button>
-                        <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
-                            <i class="fa-solid fa-wallet mr-1.5"></i> Financeiro & Caixa
-                        </button>
-                        <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
-                            <i class="fa-solid fa-cart-shopping mr-1.5"></i> Registrar Vendas
-                        </button>
-                        <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
-                            <i class="fa-solid fa-calculator mr-1.5"></i> Calculadora
-                        </button>
-                        <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-graphite hover:bg-slate-gray">
-                            <i class="fa-solid fa-chart-line mr-1.5"></i> Simulador de Negócios
-                        </button>
-                    </div>
-
-                    <!-- SUBTAB: PRODUTOS E ESTOQUE -->
-                    <div id="subtab-produtos" class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-graphite text-base">Meus Produtos Cadastrados</h4>
-                            <button onclick="openProductModal()" class="gradient-cet text-white font-bold px-4 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all text-xs flex items-center gap-2">
-                                <i class="fa-solid fa-plus"></i> Novo Produto
-                            </button>
-                        </div>
-                        <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Injetado via JS -->
-                        </div>
-                    </div>
-
-                    <!-- SUBTAB: FINANCEIRO -->
-                    <div id="subtab-financeiro" class="hidden space-y-6">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                            <h3 class="text-lg font-bold text-graphite">Controle de Caixa & Finanças</h3>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <button onclick="openExpenseModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm">
-                                    <i class="fa-solid fa-receipt mr-1"></i> Novo Lançamento (Custo/Despesa)
-                                </button>
-                                <button onclick="exportFinancialPDF()" class="bg-verde-intenso hover:opacity-90 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-sm">
-                                    <i class="fa-solid fa-file-arrow-down mr-1"></i> Exportar Relatório TXT
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- KPIs Financeiros -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Geral</p>
-                                <h4 class="text-2xl font-extrabold text-verde-esmeralda" id="kpi-receita">R$ 0,00</h4>
-                            </div>
-                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos (Produtos)</p>
-                                <h4 class="text-2xl font-extrabold text-amber-600" id="kpi-custos">R$ 0,00</h4>
-                            </div>
-                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas Operacionais</p>
-                                <h4 class="text-2xl font-extrabold text-rose-600" id="kpi-despesas">R$ 0,00</h4>
-                            </div>
-                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro Líquido</p>
-                                <h4 class="text-2xl font-extrabold text-verde-esmeralda" id="kpi-lucro">R$ 0,00</h4>
-                            </div>
-                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Capital Inicial</p>
-                                <h4 class="text-2xl font-extrabold text-roxo-profundo" id="kpi-capital">R$ 0,00</h4>
-                            </div>
-                        </div>
-
-                        <!-- Gráficos Financeiros -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-80 flex flex-col">
-                                <h4 class="font-bold text-graphite mb-4 text-sm">Receitas vs Gastos</h4>
-                                <div class="relative flex-grow">
-                                    <canvas id="financeChart1"></canvas>
-                                </div>
-                            </div>
-                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm h-80 flex flex-col">
-                                <h4 class="font-bold text-graphite mb-4 text-sm">Distribuição de Custos</h4>
-                                <div class="relative flex-grow">
-                                    <canvas id="financeChart2"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tabela de Lançamentos -->
-                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-200 font-bold text-graphite">Histórico de Movimentações</div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-sm">
-                                    <thead class="bg-slate-gray text-gray-600 uppercase text-xs">
-                                        <tr>
-                                            <th class="px-6 py-3">Data</th>
-                                            <th class="px-6 py-3">Tipo</th>
-                                            <th class="px-6 py-3">Descrição</th>
-                                            <th class="px-6 py-3">Valor</th>
-                                            <th class="px-6 py-3 text-right">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="expenses-table-body" class="divide-y divide-gray-200">
-                                        <!-- Injetado via JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SUBTAB: REGISTRO DE VENDAS -->
-                    <div id="subtab-calendario" class="hidden space-y-6">
-                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                            <h3 class="text-lg font-bold text-graphite mb-4">Registrar Nova Venda</h3>
-                            <form onsubmit="handleSaleSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Data da Venda</label>
-                                    <input type="date" id="sale-date" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Produto</label>
-                                    <select id="sale-product" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                        <!-- Preenchido via JS -->
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Quantidade</label>
-                                    <input type="number" id="sale-qty" min="1" value="1" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Total Recebido (R$)</label>
-                                    <input type="number" step="0.01" id="sale-total" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição / Cliente</label>
-                                    <input type="text" id="sale-desc" placeholder="Ex: Venda à vista para João" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div class="sm:col-span-2 flex items-end">
-                                    <button type="submit" class="w-full gradient-cet text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">
-                                        <i class="fa-solid fa-cart-plus mr-2"></i> Registrar Venda (Baixa Automática no Estoque)
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Histórico de Vendas -->
-                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <span class="font-bold text-graphite">Histórico de Vendas Registradas</span>
-                                <select id="sales-filter-period" onchange="renderSales()" class="bg-slate-gray border border-gray-300 rounded-xl px-3 py-1.5 text-xs text-graphite">
-                                    <option value="todos">Todos os períodos</option>
-                                    <option value="mes">Este mês</option>
-                                </select>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-sm">
-                                    <thead class="bg-slate-gray text-gray-600 uppercase text-xs">
-                                        <tr>
-                                            <th class="px-6 py-3">Data</th>
-                                            <th class="px-6 py-3">Produto</th>
-                                            <th class="px-6 py-3">Qtd</th>
-                                            <th class="px-6 py-3">Valor Total</th>
-                                            <th class="px-6 py-3">Descrição</th>
-                                            <th class="px-6 py-3 text-right">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="sales-table-body" class="divide-y divide-gray-200">
-                                        <!-- Injetado via JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SUBTAB: CALCULADORA -->
-                    <div id="subtab-calculadora" class="hidden space-y-6">
-                        <div class="max-w-xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
-                                <h3 class="text-lg font-bold text-graphite mb-4 text-center">Calculadora Comercial</h3>
-                                <div class="mb-4">
-                                    <input type="text" id="calc-screen" readonly class="w-full bg-roxo-profundo text-white text-right text-3xl font-mono px-4 py-4 rounded-2xl shadow-inner tracking-wider" value="0">
-                                </div>
-                                <div class="grid grid-cols-4 gap-3">
-                                    <button onclick="calcClear()" class="bg-rose-100 text-rose-700 font-bold py-3.5 rounded-xl hover:bg-rose-200 transition-all">C</button>
-                                    <button onclick="calcAppend('%')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">%</button>
-                                    <button onclick="calcAppend('/')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">÷</button>
-                                    <button onclick="calcAppend('*')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">×</button>
-
-                                    <button onclick="calcAppend('7')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">7</button>
-                                    <button onclick="calcAppend('8')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">8</button>
-                                    <button onclick="calcAppend('9')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">9</button>
-                                    <button onclick="calcAppend('-')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">-</button>
-
-                                    <button onclick="calcAppend('4')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">4</button>
-                                    <button onclick="calcAppend('5')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">5</button>
-                                    <button onclick="calcAppend('6')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">6</button>
-                                    <button onclick="calcAppend('+')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">+</button>
-
-                                    <button onclick="calcAppend('1')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">1</button>
-                                    <button onclick="calcAppend('2')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">2</button>
-                                    <button onclick="calcAppend('3')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">3</button>
-                                    <button onclick="calcCompute()" class="row-span-2 gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all flex items-center justify-center">=</button>
-
-                                    <button onclick="calcAppend('0')" class="col-span-2 bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">0</button>
-                                    <button onclick="calcAppend('.')" class="bg-slate-gray text-graphite font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">.</button>
-                                </div>
-                            </div>
-
-                            <!-- Histórico da Calculadora -->
-                            <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg flex flex-col">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-bold text-graphite">Histórico de Cálculos</h4>
-                                    <button onclick="clearCalcHistory()" class="text-xs text-rose-600 hover:underline">Limpar</button>
-                                </div>
-                                <div id="calc-history-list" class="flex-grow space-y-2 overflow-y-auto max-h-80 text-sm font-mono text-graphite">
-                                    <!-- Injetado via JS -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SUBTAB: SIMULADOR DE INVESTIMENTOS -->
-                    <div id="subtab-simulador" class="hidden space-y-8">
-                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                            <h3 class="text-lg font-bold text-graphite mb-4">Simulador de Viabilidade de Negócios</h3>
-                            <form onsubmit="handleSimulation(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Capital Disponível (R$)</label>
-                                    <input type="number" step="0.01" id="sim-capital" value="1000" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Custo de Ingredientes/Matéria (R$)</label>
-                                    <input type="number" step="0.01" id="sim-custo-unit" value="5.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Embalagens por Unidade (R$)</label>
-                                    <input type="number" step="0.01" id="sim-embalagem" value="1.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Despesas Fixas Adicionais (R$)</label>
-                                    <input type="number" step="0.01" id="sim-despesas" value="150.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. que Pretende Produzir</label>
-                                    <input type="number" id="sim-qtd-produzir" value="200" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Preço de Venda Unitário (R$)</label>
-                                    <input type="number" step="0.01" id="sim-preco-venda" value="15.00" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. Estimada de Vendas</label>
-                                    <input type="number" id="sim-qtd-vendas" value="180" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                                </div>
-                                <div class="flex items-end">
-                                    <button type="submit" class="w-full gradient-cet text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">
-                                        <i class="fa-solid fa-chart-line mr-2"></i> Simular Cenário
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Simulation Results -->
-                        <div id="sim-results" class="hidden space-y-6">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Investimento Necessário</p>
-                                    <h4 class="text-2xl font-extrabold text-graphite" id="res-investimento">R$ 0,00</h4>
-                                </div>
-                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custo por Unidade</p>
-                                    <h4 class="text-2xl font-extrabold text-amber-600" id="res-custo-unit">R$ 0,00</h4>
-                                </div>
-                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Projetada</p>
-                                    <h4 class="text-2xl font-extrabold text-verde-esmeralda" id="res-receita">R$ 0,00</h4>
-                                </div>
-                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro / Prejuízo</p>
-                                    <h4 class="text-2xl font-extrabold" id="res-lucro">R$ 0,00</h4>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Margem de Lucro</p>
-                                    <h4 class="text-xl font-extrabold text-verde-esmeralda" id="res-margem">0%</h4>
-                                </div>
-                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ponto de Equilíbrio (Break-even)</p>
-                                    <h4 class="text-xl font-extrabold text-roxo-profundo" id="res-breakeven">0 unidades</h4>
-                                </div>
-                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Viabilidade</p>
-                                    <h4 class="text-xl font-extrabold" id="res-status">-</h4>
-                                </div>
-                            </div>
-
-                            <!-- Cenários -->
-                            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                                <h4 class="text-base font-bold text-graphite mb-4">Análise Comparativa de Cenários</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="scenarios-grid">
-                                    <!-- Injetado via JS -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- CHAT FLUTUANTE DE SUPORTE / IA (RESTAURADO NO CATÁLOGO) -->
-            <div class="fixed bottom-6 right-6 z-40">
-                <div id="chat-window" class="hidden bg-white w-80 sm:w-96 rounded-3xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden mb-4 transition-all duration-300">
-                    <div class="gradient-header text-white px-5 py-4 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-full bg-verde-esmeralda flex items-center justify-center font-bold text-sm">IA</div>
-                            <div>
-                                <h4 class="font-bold text-sm">Assistente VB-ON</h4>
-                                <p class="text-[10px] text-verde-limao">Online • Tire suas dúvidas</p>
-                            </div>
-                        </div>
-                        <button onclick="toggleChat()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-                    </div>
-                    <div id="chat-messages" class="p-4 h-72 overflow-y-auto space-y-3 text-xs bg-slate-gray flex flex-col">
-                        <div class="bg-white p-3 rounded-2xl rounded-tl-sm shadow-xs max-w-[85%] text-graphite self-start">
-                            Olá! Sou o assistente virtual do VB-ON. Como posso ajudar você a encontrar produtos ou usar a plataforma hoje?
-                        </div>
-                    </div>
-                    <div class="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
-                        <input type="text" id="chat-input" onkeypress="handleChatKey(event)" placeholder="Digite sua dúvida..." class="flex-grow bg-slate-gray border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                        <button onclick="sendChatMessage()" class="gradient-cet text-white px-4 py-2 rounded-xl text-xs font-bold hover:opacity-90"><i class="fa-solid fa-paper-plane"></i></button>
-                    </div>
-                </div>
-                <button onclick="toggleChat()" class="gradient-cet text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-xl hover:scale-105 transition-all ml-auto">
-                    <i class="fa-solid fa-comments"></i>
+                <button onclick="toggleSidebarCollapse()" class="hidden md:flex text-gray-400 hover:text-gray-700 p-1.5 rounded-lg hover:bg-gray-100 transition-all">
+                    <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-500 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <!-- FOOTER -->
-            <footer class="mt-16 py-6 text-center text-sm text-gray-500 border-t border-gray-200 px-4">
-                <p class="font-bold text-graphite">VB-ON — CETI José Marques • Várzea Branca, Piauí</p>
-                <p class="mt-1">Várzea branca on-fire 🔥 | Tecnologia • Empreendedorismo • Conexão</p>
-            </footer>
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5">
+                <button onclick="switchTab('inicio'); closeMobileSidebar();" id="nav-btn-inicio" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-emerald-700 bg-emerald-50 transition-all">
+                    <i class="fa-solid fa-house w-5 text-center"></i>
+                    <span class="sidebar-text">Início</span>
+                </button>
+                <button onclick="switchTab('catalogo'); closeMobileSidebar();" id="nav-btn-catalogo" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:text-emerald-700 hover:bg-gray-50 transition-all">
+                    <i class="fa-solid fa-store w-5 text-center"></i>
+                    <span class="sidebar-text">Comércio Local</span>
+                </button>
+                <button onclick="switchTab('favoritos'); closeMobileSidebar();" id="nav-btn-favoritos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:text-emerald-700 hover:bg-gray-50 transition-all relative">
+                    <i class="fa-solid fa-heart w-5 text-center"></i>
+                    <span class="sidebar-text flex-grow text-left">Favoritos</span>
+                    <span id="fav-badge" class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-bold sidebar-text">0</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer / Merchant Area Trigger -->
+        <div class="p-4 border-t border-gray-100">
+            <button onclick="checkAdminAccess(); closeMobileSidebar();" class="w-full gradient-brand text-white px-4 py-3 rounded-xl text-sm font-bold shadow-md hover:opacity-95 transition-all flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-shop text-base"></i>
+                <span class="sidebar-text">Sou Comerciante</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="flex-grow flex flex-col min-w-0">
+        <!-- Topbar Mobile Bar -->
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 md:hidden sticky top-0 z-40">
+            <button onclick="toggleMobileSidebar()" class="text-gray-600 p-2"><i class="fa-solid fa-bars text-xl"></i></button>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center text-white text-sm font-black">VB</div>
+                <span class="font-black text-base text-gray-900">VB-<span class="text-gradient">ON</span></span>
+            </div>
+            <div class="w-8"></div>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+            <!-- 1. SEÇÃO INÍCIO -->
+            <section id="tab-inicio" class="space-y-12">
+                <div class="relative rounded-3xl gradient-brand text-white p-8 sm:p-12 overflow-hidden shadow-xl">
+                    <div class="relative z-10 max-w-2xl space-y-6">
+                        <span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Desenvolvimento Local & Comércio</span>
+                        <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">Fortalecendo os Negócios de Várzea Branca On-Fire</h2>
+                        <p class="text-white/90 text-sm sm:text-base leading-relaxed">Divulgue seus produtos, converse diretamente com clientes pelo chat interno ou WhatsApp, gerencie suas finanças e simule o crescimento do seu empreendimento em um só lugar.</p>
+                        <div class="flex flex-wrap gap-4 pt-2">
+                            <button onclick="switchTab('catalogo')" class="bg-white text-blue-700 font-extrabold px-6 py-3 rounded-2xl shadow-lg hover:bg-gray-50 transition-all text-sm">
+                                <i class="fa-solid fa-store mr-2"></i> Explorar Vitrine
+                            </button>
+                            <button onclick="checkAdminAccess()" class="bg-blue-900/40 backdrop-blur-md border border-white/30 text-white font-bold px-6 py-3 rounded-2xl hover:bg-blue-900/60 transition-all text-sm">
+                                <i class="fa-solid fa-chart-line mr-2"></i> Acessar Painel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-4">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg mb-2">Chat Direto</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">Negocie produtos e tire dúvidas diretamente com os comerciantes pelo chat interno com histórico em tempo real.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mb-4">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg mb-2">Gestão Financeira</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">Controle custos, despesas, margens de lucro e exporte relatórios comerciais práticos.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold mb-4">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-lg mb-2">Simulador de Viabilidade</h3>
+                        <p class="text-gray-500 text-sm leading-relaxed">Calcule ponto de equilíbrio, preços de venda e analise cenários de lucro para o seu negócio.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. SEÇÃO CATÁLOGO PÚBLICO -->
+            <section id="tab-catalogo" class="hidden space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-900">Vitrine do Comércio Local</h2>
+                        <p class="text-sm text-gray-500">Conectando compradores e comerciantes em Várzea Branca On-Fire.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Buscar produtos..." class="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 shadow-xs">
+                        <select id="catalog-category" onchange="renderCatalog()" class="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 shadow-xs">
+                            <option value="">Todas as Categorias</option>
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Vestuário">Vestuário</option>
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Serviços">Serviços</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                        <select id="catalog-sort" onchange="renderCatalog()" class="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 shadow-xs">
+                            <option value="recentes">Mais Recentes</option>
+                            <option value="menor-preco">Menor Preço</option>
+                            <option value="maior-preco">Maior Preço</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Injetado via JS -->
+                </div>
+            </section>
+
+            <!-- 3. SEÇÃO FAVORITOS -->
+            <section id="tab-favoritos" class="hidden space-y-8">
+                <div>
+                    <h2 class="text-2xl font-black text-gray-900">Meus Produtos Favoritos</h2>
+                    <p class="text-sm text-gray-500">Lista rápida dos itens que você salvou para conferir depois.</p>
+                </div>
+                <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Injetado via JS -->
+                </div>
+            </section>
+
+            <!-- 4. PAINEL DO COMERCIANTE -->
+            <section id="tab-painel" class="hidden space-y-8">
+                <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl gradient-brand text-white flex items-center justify-center text-2xl font-bold shadow-md">
+                            <i class="fa-solid fa-shop"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-black text-gray-900" id="merchant-welcome-name">Painel do Comerciante</h2>
+                            <p class="text-xs text-gray-500">Gerencie estoque, finanças, simulações e mensagens de clientes.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="openProfileModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-xl text-xs transition-all"><i class="fa-solid fa-gear mr-1"></i> Configurações</button>
+                        <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2 rounded-xl text-xs transition-all"><i class="fa-solid fa-right-from-bracket mr-1"></i> Sair</button>
+                    </div>
+                </div>
+
+                <!-- Subtabs Nav -->
+                <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
+                    <button onclick="switchSubTab('produtos')" id="subtab-btn-produtos" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-sm transition-all">Meus Produtos & Estoque</button>
+                    <button onclick="switchSubTab('mensagens')" id="subtab-btn-mensagens" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-gray-600 hover:bg-gray-50 transition-all">Mensagens Recebidas</button>
+                    <button onclick="switchSubTab('financeiro')" id="subtab-btn-financeiro" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-gray-600 hover:bg-gray-50 transition-all">Gestão Financeira</button>
+                    <button onclick="switchSubTab('calendario')" id="subtab-btn-calendario" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-gray-600 hover:bg-gray-50 transition-all">Registro de Vendas</button>
+                    <button onclick="switchSubTab('calculadora')" id="subtab-btn-calculadora" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-gray-600 hover:bg-gray-50 transition-all">Calculadora</button>
+                    <button onclick="switchSubTab('simulador')" id="subtab-btn-simulador" class="subtab-btn px-5 py-2.5 rounded-xl text-xs font-bold bg-white text-gray-600 hover:bg-gray-50 transition-all">Simulador</button>
+                </div>
+
+                <!-- SUBTAB: PRODUTOS -->
+                <div id="subtab-produtos" class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-900">Gerenciamento de Produtos</h3>
+                        <button onclick="openProductModal()" class="gradient-brand text-white font-semibold px-5 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-xs">
+                            <i class="fa-solid fa-plus mr-1"></i> Cadastrar Produto
+                        </button>
+                    </div>
+                    <div id="merchant-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Injetado via JS -->
+                    </div>
+                </div>
+
+                <!-- SUBTAB: MENSAGENS -->
+                <div id="subtab-mensagens" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Caixa de Entrada de Mensagens</h3>
+                        <p class="text-xs text-gray-500 mb-6">Mensagens enviadas por clientes interessados nos seus produtos.</p>
+                        
+                        <div id="merchant-messages-list" class="space-y-4">
+                            <!-- Injetado via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB: FINANCEIRO -->
+                <div id="subtab-financeiro" class="hidden space-y-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Geral</p>
+                            <h4 class="text-2xl font-extrabold text-emerald-600" id="kpi-receita">R$ 0,00</h4>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custos Totais</p>
+                            <h4 class="text-2xl font-extrabold text-amber-600" id="kpi-custos">R$ 0,00</h4>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Despesas Operacionais</p>
+                            <h4 class="text-2xl font-extrabold text-rose-600" id="kpi-despesas">R$ 0,00</h4>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro Líquido</p>
+                            <h4 class="text-2xl font-extrabold text-blue-600" id="kpi-lucro">R$ 0,00</h4>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Capital Inicial</p>
+                            <h4 class="text-2xl font-extrabold text-gray-900" id="kpi-capital">R$ 0,00</h4>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <h4 class="font-bold text-gray-900 mb-4">Fluxo Financeiro (Receitas x Gastos)</h4>
+                            <div class="h-64"><canvas id="financeChart1"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <h4 class="font-bold text-gray-900 mb-4">Composição de Custos e Despesas</h4>
+                            <div class="h-64"><canvas id="financeChart2"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <span class="font-bold text-gray-900">Histórico de Lançamentos</span>
+                            <div class="flex gap-2">
+                                <button onclick="openExpenseModal()" class="gradient-brand text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs"><i class="fa-solid fa-plus mr-1"></i> Novo Lançamento</button>
+                                <button onclick="exportFinancialPDF()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-xl"><i class="fa-solid fa-download mr-1"></i> Exportar Relatório</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                    <tr>
+                                        <th class="px-6 py-3">Data</th>
+                                        <th class="px-6 py-3">Tipo</th>
+                                        <th class="px-6 py-3">Descrição</th>
+                                        <th class="px-6 py-3">Valor</th>
+                                        <th class="px-6 py-3 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-table-body" class="divide-y divide-gray-200">
+                                    <!-- Injetado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB: REGISTRO DE VENDAS -->
+                <div id="subtab-calendario" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Registrar Nova Venda</h3>
+                        <form onsubmit="handleSaleSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Data da Venda</label>
+                                <input type="date" id="sale-date" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Produto</label>
+                                <select id="sale-product" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                                    <!-- Preenchido via JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Quantidade</label>
+                                <input type="number" id="sale-qty" min="1" value="1" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Valor Total Recebido (R$)</label>
+                                <input type="number" step="0.01" id="sale-total" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição / Cliente</label>
+                                <input type="text" id="sale-desc" placeholder="Ex: Venda à vista para João" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                            </div>
+                            <div class="sm:col-span-2 flex items-end">
+                                <button type="submit" class="w-full gradient-brand text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">
+                                    <i class="fa-solid fa-cart-plus mr-2"></i> Registrar Venda (Baixa Automática no Estoque)
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <span class="font-bold text-gray-900">Histórico de Vendas Registradas</span>
+                            <select id="sales-filter-period" onchange="renderSales()" class="bg-gray-50 border border-gray-300 rounded-xl px-3 py-1.5 text-xs text-gray-900">
+                                <option value="todos">Todos os períodos</option>
+                                <option value="mes">Este mês</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                    <tr>
+                                        <th class="px-6 py-3">Data</th>
+                                        <th class="px-6 py-3">Produto</th>
+                                        <th class="px-6 py-3">Qtd</th>
+                                        <th class="px-6 py-3">Valor Total</th>
+                                        <th class="px-6 py-3">Descrição</th>
+                                        <th class="px-6 py-3 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sales-table-body" class="divide-y divide-gray-200">
+                                    <!-- Injetado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB: CALCULADORA -->
+                <div id="subtab-calculadora" class="hidden space-y-6">
+                    <div class="max-w-xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">Calculadora Comercial</h3>
+                            <div class="mb-4">
+                                <input type="text" id="calc-screen" readonly class="w-full bg-gray-900 text-white text-right text-3xl font-mono px-4 py-4 rounded-2xl shadow-inner tracking-wider" value="0">
+                            </div>
+                            <div class="grid grid-cols-4 gap-3">
+                                <button onclick="calcClear()" class="bg-rose-100 text-rose-700 font-bold py-3.5 rounded-xl hover:bg-rose-200 transition-all">C</button>
+                                <button onclick="calcAppend('%')" class="bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">%</button>
+                                <button onclick="calcAppend('/')" class="bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all">÷</button>
+                                <button onclick="calcAppend('*')" class="bg-blue-100 text-blue-700 font-bold py-3.5 rounded-xl hover:bg-blue-200 transition-all">×</button>
+
+                                <button onclick="calcAppend('7')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">7</button>
+                                <button onclick="calcAppend('8')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">8</button>
+                                <button onclick="calcAppend('9')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">9</button>
+                                <button onclick="calcAppend('-')" class="bg-blue-100 text-blue-700 font-bold py-3.5 rounded-xl hover:bg-blue-200 transition-all">-</button>
+
+                                <button onclick="calcAppend('4')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">4</button>
+                                <button onclick="calcAppend('5')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">5</button>
+                                <button onclick="calcAppend('6')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">6</button>
+                                <button onclick="calcAppend('+')" class="bg-blue-100 text-blue-700 font-bold py-3.5 rounded-xl hover:bg-blue-200 transition-all">+</button>
+
+                                <button onclick="calcAppend('1')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">1</button>
+                                <button onclick="calcAppend('2')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">2</button>
+                                <button onclick="calcAppend('3')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">3</button>
+                                <button onclick="calcCompute()" class="row-span-2 gradient-brand text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all flex items-center justify-center">=</button>
+
+                                <button onclick="calcAppend('0')" class="col-span-2 bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">0</button>
+                                <button onclick="calcAppend('.')" class="bg-gray-50 text-gray-800 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-all">.</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-lg flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-bold text-gray-900">Histórico de Cálculos</h4>
+                                <button onclick="clearCalcHistory()" class="text-xs text-rose-600 hover:underline">Limpar</button>
+                            </div>
+                            <div id="calc-history-list" class="flex-grow space-y-2 overflow-y-auto max-h-80 text-sm font-mono text-gray-600">
+                                <!-- Injetado via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB: SIMULADOR -->
+                <div id="subtab-simulador" class="hidden space-y-8">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Simulador de Viabilidade de Negócios</h3>
+                        <form onsubmit="handleSimulation(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Capital Disponível (R$)</label>
+                                <input type="number" step="0.01" id="sim-capital" value="1000" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Custo de Ingredientes/Matéria (R$)</label>
+                                <input type="number" step="0.01" id="sim-custo-unit" value="5.00" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Embalagens por Unidade (R$)</label>
+                                <input type="number" step="0.01" id="sim-embalagem" value="1.00" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Despesas Fixas Adicionais (R$)</label>
+                                <input type="number" step="0.01" id="sim-despesas" value="150.00" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. que Pretende Produzir</label>
+                                <input type="number" id="sim-qtd-produzir" value="200" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Preço de Venda Unitário (R$)</label>
+                                <input type="number" step="0.01" id="sim-preco-venda" value="15.00" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. Estimada de Vendas</label>
+                                <input type="number" id="sim-qtd-vendas" value="180" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full gradient-brand text-white font-semibold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">
+                                    <i class="fa-solid fa-chart-line mr-2"></i> Simular Cenário
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="sim-results" class="hidden space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Investimento Necessário</p>
+                                <h4 class="text-2xl font-extrabold text-gray-900" id="res-investimento">R$ 0,00</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Custo por Unidade</p>
+                                <h4 class="text-2xl font-extrabold text-amber-600" id="res-custo-unit">R$ 0,00</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receita Projetada</p>
+                                <h4 class="text-2xl font-extrabold text-emerald-600" id="res-receita">R$ 0,00</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Lucro / Prejuízo</p>
+                                <h4 class="text-2xl font-extrabold" id="res-lucro">R$ 0,00</h4>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Margem de Lucro</p>
+                                <h4 class="text-xl font-extrabold text-blue-600" id="res-margem">0%</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ponto de Equilíbrio (Break-even)</p>
+                                <h4 class="text-xl font-extrabold text-purple-600" id="res-breakeven">0 unidades</h4>
+                            </div>
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Viabilidade</p>
+                                <h4 class="text-xl font-extrabold" id="res-status">-</h4>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <h4 class="text-base font-bold text-gray-900 mb-4">Análise Comparativa de Cenários</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="scenarios-grid">
+                                <!-- Injetado via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-white border-t border-gray-200 mt-12 py-8 text-center text-sm text-gray-500">
+            <div class="max-w-7xl mx-auto px-4">
+                <p class="font-bold text-gray-700">VB-ON — Várzea Branca On-Fire</p>
+                <p class="mt-1">Plataforma de Comércio Local e Gestão Financeira para Empreendedores.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODAL: CHAT DO PRODUTO -->
+    <div id="chat-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative flex flex-col h-[550px]">
+            <button onclick="closeChatModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="flex items-center space-x-3 pb-4 border-b border-gray-100">
+                <div id="chat-product-img" class="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden shrink-0">
+                    <img src="" class="w-full h-full object-cover">
+                </div>
+                <div                <div id="chat-product-img" class="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden shrink-0">
+                    <img src="" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h4 id="chat-product-name" class="font-bold text-gray-900 text-sm">Nome do Produto</h4>
+                    <p id="chat-product-price" class="text-xs font-extrabold text-blue-600">R$ 0,00</p>
+                </div>
+            </div>
+
+            <!-- Chat Messages Container -->
+            <div id="chat-messages-container" class="flex-grow overflow-y-auto py-4 space-y-3 px-2">
+                <!-- Injetado via JS -->
+            </div>
+
+            <!-- Chat Input -->
+            <form onsubmit="handleSendMessage(event)" class="pt-3 border-t border-gray-100 flex gap-2">
+                <input type="text" id="chat-input-msg" placeholder="Digite sua mensagem para o vendedor..." required class="flex-grow bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900">
+                <button type="submit" class="gradient-brand text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:opacity-95 transition-all">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: LOGIN / CADASTRO -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-2xl gradient-brand text-white flex items-center justify-center text-2xl mx-auto mb-3 shadow-md">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-2xl font-extrabold text-gray-900" id="auth-title">Área do Comerciante</h3>
+                <p class="text-gray-500 text-xs mt-1" id="auth-subtitle">Informe suas credenciais ou cadastre-se</p>
+            </div>
+
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div id="auth-name-group" class="hidden">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Negócio / Comerciante</label>
+                    <input type="text" id="auth-input-name" placeholder="Ex: Loja da Maria" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Usuário / Login (ex: adm)</label>
+                    <input type="text" id="auth-input-user" required placeholder="Ex: adm" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Senha (ex: 123)</label>
+                    <input type="password" id="auth-input-pass" required placeholder="••••••" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full gradient-brand text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Entrar no Painel</button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs font-semibold text-blue-600 hover:underline">Não tem conta? Cadastre-se agora</button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL: PRODUTO -->
     <div id="product-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-8 shadow-2xl relative my-8">
             <button onclick="closeProductModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-extrabold text-graphite mb-6" id="product-modal-title">Cadastrar Novo Produto</h3>
+            <h3 class="text-xl font-extrabold text-gray-900 mb-6" id="product-modal-title">Cadastrar Novo Produto</h3>
 
             <form onsubmit="handleProductSubmit(event)" class="space-y-4">
                 <input type="hidden" id="prod-edit-id">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Produto</label>
-                        <input type="text" id="prod-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
-                    </div>
-                    <div>
+                        <input type="text" id="prod-name" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
+                    </div><div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Categoria</label>
-                        <select id="prod-cat" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                        <select id="prod-cat" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                             <option value="Alimentação">Alimentação</option>
                             <option value="Vestuário">Vestuário</option>
                             <option value="Eletrônicos">Eletrônicos</option>
@@ -600,72 +597,72 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Preço (R$)</label>
-                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                        <input type="number" step="0.01" id="prod-price" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Qtd. em Estoque</label>
-                        <input type="number" id="prod-stock" min="0" value="10" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                        <input type="number" id="prod-stock" min="0" value="10" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Localização</label>
-                        <input type="text" id="prod-location" value="Várzea Branca - PI" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                        <input type="text" id="prod-location" value="Várzea Branca - PI" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Foto de Capa (Selecione do Dispositivo)</label>
-                    <input type="file" id="prod-img-file" accept="image/*" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-verde-intenso hover:file:bg-emerald-100 text-graphite">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Foto de Capa</label>
+                    <input type="file" id="prod-img-file" accept="image/*" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2 text-sm text-gray-900">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp para Contato (com DDD)</label>
-                    <input type="text" id="prod-whatsapp" placeholder="5589999999999" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp para Contato</label>
+                    <input type="text" id="prod-whatsapp" placeholder="Ex: 5589999999999" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição Completa</label>
-                    <textarea id="prod-desc" rows="3" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-verde-esmeralda text-graphite"></textarea>
+                    <textarea id="prod-desc" rows="3" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900"></textarea>
                 </div>
 
-                <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Salvar Produto</button>
+                <button type="submit" class="w-full gradient-brand text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Produto</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: DADOS COMERCIAIS -->
     <div id="profile-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
             <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-extrabold text-graphite mb-6">Configurações Comerciais</h3>
+            <h3 class="text-xl font-extrabold text-gray-900 mb-6">Configurações Comerciais</h3>
 
             <form onsubmit="handleProfileSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Negócio</label>
-                    <input type="text" id="prof-name" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                    <input type="text" id="prof-name" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Horário de Funcionamento</label>
-                    <input type="text" id="prof-hours" placeholder="Ex: Seg a Sex, 08h às 18h" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                    <input type="text" id="prof-hours" placeholder="Ex: Seg a Sex, 08h às 18h" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp Principal</label>
-                    <input type="text" id="prof-whatsapp" placeholder="Ex: 5589999999999" class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                    <input type="text" id="prof-whatsapp" placeholder="Ex: 5589999999999" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                 </div>
-                <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Salvar Alterações</button>
+                <button type="submit" class="w-full gradient-brand text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Alterações</button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: LANÇAMENTO FINANCEIRO -->
     <div id="expense-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative">
             <button onclick="closeExpenseModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-extrabold text-graphite mb-6">Registrar Lançamento Financeiro</h3>
+            <h3 class="text-xl font-extrabold text-gray-900 mb-6">Registrar Lançamento Financeiro</h3>
 
             <form onsubmit="handleExpenseSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Tipo de Lançamento</label>
-                    <select id="exp-type" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                    <select id="exp-type" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                         <option value="Custo">Custo (Gastos diretos com produtos)</option>
                         <option value="Despesa">Despesa (Gastos operacionais do negócio)</option>
                         <option value="Capital">Capital Inicial (Valor investido)</option>
@@ -673,25 +670,27 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Data</label>
-                    <input type="date" id="exp-date" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                    <input type="date" id="exp-date" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Descrição</label>
-                    <input type="text" id="exp-desc" placeholder="Ex: Compra de matéria-prima, Aluguel..." required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                    <input type="text" id="exp-desc" placeholder="Ex: Compra de matéria-prima, Aluguel..." required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Valor (R$)</label>
-                    <input type="number" step="0.01" id="exp-val" required class="w-full bg-slate-gray border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-graphite">
+                    <input type="number" step="0.01" id="exp-val" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900">
                 </div>
-                <button type="submit" class="w-full gradient-cet text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-90 transition-all text-sm">Salvar Lançamento</button>
+                <button type="submit" class="w-full gradient-brand text-white font-bold py-3.5 rounded-xl shadow-md hover:opacity-95 transition-all text-sm">Salvar Lançamento</button>
             </form>
         </div>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        let db = JSON.parse(localStorage.getItem('conecta_vb_db_v7')) || {
+        let db = JSON.parse(localStorage.getItem('conecta_vbon_db_v4')) || {
             currentUser: null,
+            isAuthModeRegister: false,
+            sidebarCollapsed: false,
             merchants: [
                 { user: 'adm', pass: '123', name: 'Comércio Exemplo VB', hours: 'Seg a Sáb, 08h às 18h', whatsapp: '5589999999999' }
             ],
@@ -707,12 +706,18 @@
                 { id: '2', user: 'adm', type: 'Custo', date: '2026-11-02', desc: 'Ingredientes para bolos', val: 150.00 },
                 { id: '3', user: 'adm', type: 'Despesa', date: '2026-11-05', desc: 'Embalagens e sacolas', val: 60.00 }
             ],
+            messages: [
+                { id: 'm1', productId: '1', sender: 'Cliente João', isMerchant: false, text: 'Olá, tem pronta entrega?', time: '14:32' },
+                { id: 'm2', productId: '1', sender: 'Comércio Exemplo VB', isMerchant: true, text: 'Olá João! Sim, temos 2 unidades prontas.', time: '14:35' }
+            ],
             favorites: [],
             calcHistory: []
         };
 
+        let activeChatProductId = null;
+
         function saveDB() {
-            localStorage.setItem('conecta_vb_db_v7', JSON.stringify(db));
+            localStorage.setItem('conecta_vbon_db_v4', JSON.stringify(db));
         }
 
         function showToast(msg) {
@@ -725,80 +730,56 @@
         }
 
         // --- SIDEBAR TOGGLE ---
-        let isSidebarCollapsed = false;
-        function toggleSidebar() {
+        function toggleSidebarCollapse() {
+            db.sidebarCollapsed = !db.sidebarCollapsed;
+            saveDB();
+            applySidebarState();
+        }
+
+        function applySidebarState() {
             const sidebar = document.getElementById('sidebar');
             const texts = document.querySelectorAll('.sidebar-text');
             const icon = document.getElementById('sidebar-toggle-icon');
-            const brand = document.getElementById('sidebar-brand');
 
-            isSidebarCollapsed = !isSidebarCollapsed;
-            if(isSidebarCollapsed) {
-                sidebar.classList.remove('lg:w-64');
-                sidebar.classList.add('lg:w-20');
-                texts.forEach(t => t.classList.add('hidden'));
-                brand.classList.add('hidden');
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
+            if(db.sidebarCollapsed) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                texts.forEach(el => el.classList.add('hidden'));
+                icon.className = 'fa-solid fa-chevron-right text-sm';
             } else {
-                sidebar.classList.remove('lg:w-20');
-                sidebar.classList.add('lg:w-64');
-                texts.forEach(t => t.classList.remove('hidden'));
-                brand.classList.remove('hidden');
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                texts.forEach(el => el.classList.remove('hidden'));
+                icon.className = 'fa-solid fa-chevron-left text-sm';
             }
         }
 
-        // --- CHAT IA WIDGET ---
-        function toggleChat() {
-            const win = document.getElementById('chat-window');
-            win.classList.toggle('hidden');
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
         }
 
-        function handleChatKey(e) {
-            if(e.key === 'Enter') sendChatMessage();
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if(!text) return;
-
-            const container = document.getElementById('chat-messages');
-            container.innerHTML += `<div class="bg-purple-100 text-purple-900 p-3 rounded-2xl rounded-tr-sm shadow-xs max-w-[85%] self-end">${text}</div>`;
-            input.value = '';
-            container.scrollTop = container.scrollHeight;
-
-            setTimeout(() => {
-                let reply = "Que bacana sua dúvida! No VB-ON você pode navegar pelas categorias, favoritar itens e negociar direto com o vendedor pelo WhatsApp. Se for comerciante, acesse seu painel para gerenciar produtos e finanças!";
-                const lower = text.toLowerCase();
-                if(lower.includes('bolo') || lower.includes('comida')) {
-                    reply = "Temos ótimas opções de alimentação artesanal em Várzea Branca no catálogo principal!";
-                } else if(lower.includes('ajuda') || lower.includes('painel')) {
-                    reply = "Basta clicar em 'Cadastrar Negócio' ou 'Acessar Meu Painel' no menu para gerenciar seu estoque e caixa.";
-                }
-                container.innerHTML += `<div class="bg-white p-3 rounded-2xl rounded-tl-sm shadow-xs max-w-[85%] text-graphite self-start">${reply}</div>`;
-                container.scrollTop = container.scrollHeight;
-            }, 600);
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.add('-translate-x-full');
         }
 
         // --- NAVIGATION TABS ---
         function switchTab(tabId) {
-            document.querySelectorAll('main > .max-w-7xl > section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-white/10', 'text-verde-limao');
-            btn.classList.add('text-white/80');
+                btn.classList.remove('bg-emerald-50', 'text-emerald-700');
+                btn.classList.add('text-gray-600');
             });
             const activeBtn = document.getElementById('nav-btn-' + tabId);
             if(activeBtn) {
-                activeBtn.classList.add('bg-white/10', 'text-verde-limao');
-                activeBtn.classList.remove('text-white/80');
+                activeBtn.classList.add('bg-emerald-50', 'text-emerald-700');
+                activeBtn.classList.remove('text-gray-600');
             }
 
-            if(tabId === 'inicio') renderCatalog();
+            if(tabId === 'catalogo') renderCatalog();
             if(tabId === 'favoritos') renderFavorites();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -808,81 +789,230 @@
             document.getElementById('subtab-' + subId).classList.remove('hidden');
 
             document.querySelectorAll('.subtab-btn').forEach(btn => {
-                btn.classList.remove('bg-verde-esmeralda', 'text-white', 'shadow-sm');
-                btn.classList.add('bg-white', 'text-graphite');
+                btn.classList.remove('gradient-brand', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-white', 'text-gray-600');
             });
             const activeBtn = document.getElementById('subtab-btn-' + subId);
-            activeBtn.classList.add('bg-verde-esmeralda', 'text-white', 'shadow-sm');
-            activeBtn.classList.remove('bg-white', 'text-graphite');
+            activeBtn.classList.add('gradient-brand', 'text-white', 'shadow-sm');
+            activeBtn.classList.remove('bg-white', 'text-gray-600');
 
             if(subId === 'produtos') renderMerchantProducts();
+            if(subId === 'mensagens') renderMerchantMessages();
             if(subId === 'financeiro') { renderFinancials(); initCharts(); }
             if(subId === 'calendario') renderSales();
             if(subId === 'calculadora') renderCalcHistory();
         }
 
-        // --- AUTH & HEADER STATUS ---
-        function updateAuthBar() {
-            const bar = document.getElementById('auth-status-bar');
-            if(db.currentUser) {
-                const m = db.merchants.find(item => item.user === db.currentUser);
-                bar.innerHTML = `
-                    <span class="text-xs font-bold text-verde-intenso hidden sm:inline">Olá, ${m ? m.name : db.currentUser}</span>
-                    <button onclick="switchTab('painel'); switchSubTab('produtos');" class="gradient-cet text-white text-xs font-bold px-3 py-2 rounded-xl shadow-sm">Meu Painel</button>
-                `;
-            } else {
-                bar.innerHTML = `
-                    <button onclick="switchTab('cadastro')" class="bg-slate-gray hover:bg-gray-200 text-graphite text-xs font-bold px-3 py-2 rounded-xl transition-all">Cadastrar Loja</button>
-                `;
+        // --- CHAT SYSTEM ---
+        function openChatModal(productId) {
+            activeChatProductId = productId;
+            const p = db.products.find(item => item.id === productId);
+            if(!p) return;
+
+            document.getElementById('chat-product-name').innerText = p.name;
+            document.getElementById('chat-product-price').innerText = `R$ ${p.price.toFixed(2)}`;
+            document.getElementById('chat-product-img').querySelector('img').src = p.img;
+
+            renderChatMessages();
+            document.getElementById('chat-modal').classList.remove('hidden');
+        }
+
+        function closeChatModal() {
+            document.getElementById('chat-modal').classList.add('hidden');
+            activeChatProductId = null;
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages-container');
+            const chatMsgs = db.messages.filter(m => m.productId === activeChatProductId);
+
+            if(chatMsgs.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-400 text-xs"><p>Nenhuma mensagem ainda. Inicie a conversa com o vendedor!</p></div>`;
+                return;
+            }
+
+            container.innerHTML = chatMsgs.map(m => `
+                <div class="flex flex-col ${m.isMerchant ? 'items-end' : 'items-start'}">
+                    <div class="max-w-[80%] rounded-2xl px-4 py-3 text-sm ${m.isMerchant ? 'bg-emerald-600 text-white rounded-br-none' : 'bg-gray-100 text-gray-800 rounded-bl-none'}">
+                        <p class="text-[10px] font-bold opacity-75 mb-0.5">${m.sender}</p>
+                        <p>${m.text}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-1 text-[10px] text-gray-4                    </div>
+                    <div class="flex items-center space-x-2 mt-1 text-[10px] text-gray-400">
+                        <span>${m.time}</span>
+                        <button onclick="deleteMessage('${m.id}')" class="hover:text-rose-600" title="Apagar"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleSendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input-msg');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const senderName = db.currentUser ? (db.merchants.find(m => m.user === db.currentUser)?.name || 'Comerciante') : 'Cliente Anônimo';
+            const isMerchantSender = db.currentUser !== null;
+
+            db.messages.push({
+                id: Date.now().toString(),
+                productId: activeChatProductId,
+                sender: senderName,
+                isMerchant: isMerchantSender,
+                text: text,
+                time: timeStr
+            });
+
+            saveDB();
+            input.value = '';
+            renderChatMessages();
+            if(!document.getElementById('subtab-mensagens').classList.contains('hidden')) {
+                renderMerchantMessages();
             }
         }
 
-        // --- WHATSAPP DIRECT INTEGRATION ---
-        function openWhatsAppChat(phone, productName) {
-            const cleanPhone = phone.replace(/\D/g, '');
-            const message = encodeURIComponent(`Olá! Vi o produto *${productName}* no catálogo do VB-ON (CETI José Marques) e tenho interesse. Está disponível?`);
-            window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+        function deleteMessage(msgId) {
+            db.messages = db.messages.filter(m => m.id !== msgId);
+            saveDB();
+            renderChatMessages();
+            if(!document.getElementById('subtab-mensagens').classList.contains('hidden')) {
+                renderMerchantMessages();
+            }
+            showToast('Mensagem apagada.');
         }
 
+        function renderMerchantMessages() {
+            const container = document.getElementById('merchant-messages-list');
+            const myProductsIds = db.products.filter(p => p.user === db.currentUser).map(p => p.id);
+            const myMessages = db.messages.filter(m => myProductsIds.includes(m.productId));
+
+            if(myMessages.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-400 text-sm"><i class="fa-regular fa-comments text-3xl mb-2"></i><p>Nenhuma mensagem recebida para os seus produtos.</p></div>`;
+                return;
+            }
+
+            const grouped = {};
+            myMessages.forEach(m => {
+                if(!grouped[m.productId]) grouped[m.productId] = [];
+                grouped[m.productId].push(m);
+            });
+
+            container.innerHTML = Object.keys(grouped).map(prodId => {
+                const prod = db.products.find(p => p.id === prodId);
+                const msgs = grouped[prodId];
+                return `
+                    <div class="bg-gray-50 rounded-2xl p-5 border border-gray-200 space-y-4">
+                        <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+                            <div class="flex items-center space-x-3">
+                                <img src="${prod ? prod.img : ''}" class="w-10 h-10 rounded-xl object-cover">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm">${prod ? prod.name : 'Produto'}</h4>
+                                    <span class="text-xs text-blue-600 font-extrabold">R$ ${prod ? prod.price.toFixed(2) : '0,00'}</span>
+                                </div>
+                            </div>
+                            <button onclick="openChatModal('${prodId}')" class="gradient-brand text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs">
+                                <i class="fa-solid fa-reply mr-1"></i> Responder no Chat
+                            </button>
+                        </div>
+                        <div class="space-y-2">
+                            ${msgs.map(m => `
+                                <div class="bg-white p-3 rounded-xl border border-gray-100 flex items-start justify-between gap-4">
+                                    <div>
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <span class="text-xs font-bold ${m.isMerchant ? 'text-emerald-600' : 'text-blue-600'}">${m.sender}</span>
+                                            <span class="text-[10px] text-gray-400"><i class="fa-regular fa-clock mr-1"></i>${m.time}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700">${m.text}</p>
+                                    </div>
+                                    <button onclick="deleteMessage('${m.id}')" class="text-gray-400 hover:text-rose-600 text-xs p-1" title="Apagar"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- AUTH SYSTEM ---
         function checkAdminAccess() {
             if(!db.currentUser) {
-                switchTab('cadastro');
-                showToast('Cadastre-se ou acesse com uma conta para gerenciar.');
+                document.getElementById('auth-modal').classList.remove('hidden');
             } else {
                 switchTab('painel');
                 switchSubTab('produtos');
             }
         }
 
-        function handlePublicRegister(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-input-name').value.trim();
-            const user = document.getElementById('reg-input-user').value.trim();
-            const pass = document.getElementById('reg-input-pass').value.trim();
+        function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
-            if(db.merchants.some(m => m.user === user)) {
-                alert('Este usuário já existe. Escolha outro.');
-                return;
+        function toggleAuthMode() {
+            db.isAuthModeRegister = !db.isAuthModeRegister;
+            const title = document.getElementById('auth-title');
+            const sub = document.getElementById('auth-subtitle');
+            const nameGrp = document.getElementById('auth-name-group');
+            const btn = document.getElementById('auth-submit-btn');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+
+            if(db.isAuthModeRegister) {
+                title.innerText = 'Cadastro de Comerciante';
+                sub.innerText = 'Crie sua conta para gerenciar seu negócio';
+                nameGrp.classList.remove('hidden');
+                btn.innerText = 'Cadastrar e Entrar';
+                toggleBtn.innerText = 'Já tem uma conta? Faça login';
+            } else {
+                title.innerText = 'Área do Comerciante';
+                sub.innerText = 'Informe suas credenciais ou cadastre-se';
+                nameGrp.classList.add('hidden');
+                btn.innerText = 'Entrar no Painel';
+                toggleBtn.innerText = 'Não tem conta? Cadastre-se agora';
             }
+        }
 
-            db.merchants.push({ user, pass, name, hours: 'Seg a Sex, 08h às 18h', whatsapp: '5589999999999' });
-            db.currentUser = user;
-            saveDB();
-            updateAuthBar();
-            showToast('Cadastro realizado com sucesso!');
-            switchTab('painel');
-            switchSubTab('produtos');
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const user = document.getElementById('auth-input-user').value.trim();
+            const pass = document.getElementById('auth-input-pass').value.trim();
+            const name = document.getElementById('auth-input-name').value.trim();
+
+            if(db.isAuthModeRegister) {
+                if(db.merchants.some(m => m.user === user)) {
+                    alert('Este usuário já existe. Escolha outro.');
+                    return;
+                }
+                db.merchants.push({ user, pass, name: name || user, hours: 'Seg a Sex, 08h às 18h', whatsapp: '5589999999999' });
+                db.currentUser = user;
+                saveDB();
+                closeAuthModal();
+                showToast('Conta criada com sucesso!');
+                switchTab('painel');
+                switchSubTab('produtos');
+            } else {
+                const found = db.merchants.find(m => m.user === user && m.pass === pass);
+                if(found) {
+                    db.currentUser = user;
+                    saveDB();
+                    closeAuthModal();
+                    showToast('Bem-vindo de volta!');
+                    switchTab('painel');
+                    switchSubTab('produtos');
+                } else {
+                    alert('Usuário ou senha incorretos.');
+                }
+            }
         }
 
         function logoutAdmin() {
             db.currentUser = null;
             saveDB();
-            updateAuthBar();
             switchTab('inicio');
             showToast('Sessão encerrada.');
         }
 
-        // --- PUBLIC CATALOG, FAVORITES & SHARING ---
+        // --- CATALOG & FAVORITES ---
         function toggleFavorite(id) {
             if(db.favorites.includes(id)) {
                 db.favorites = db.favorites.filter(favId => favId !== id);
@@ -893,7 +1023,7 @@
             }
             saveDB();
             updateFavBadge();
-            if(!document.getElementById('tab-inicio').classList.contains('hidden')) renderCatalog();
+            if(!document.getElementById('tab-catalogo').classList.contains('hidden')) renderCatalog();
             if(!document.getElementById('tab-favoritos').classList.contains('hidden')) renderFavorites();
         }
 
@@ -902,7 +1032,7 @@
         }
 
         function shareProduct(name, price) {
-            const text = `Confira este produto incrível em Várzea Branca–PI (CETI José Marques): *${name}* por apenas R$ ${price.toFixed(2)} no VB-ON!`;
+            const text = `Confira este produto incrível em Várzea Branca On-Fire: *${name}* por apenas R$ ${price.toFixed(2)} no VB-ON!`;
             if(navigator.share) {
                 navigator.share({ title: 'VB-ON', text: text, url: window.location.href }).catch(() => {});
             } else {
@@ -935,42 +1065,40 @@
             grid.innerHTML = filtered.map(p => {
                 const isFav = db.favorites.includes(p.id);
                 const isOut = p.stock <= 0;
-                const imgSrc = p.img || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
                 return `
-                    <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col relative">
+                    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col relative">
                         <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-rose-500 shadow-md hover:scale-105 transition-all">
                             <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart text-lg"></i>
                         </button>
-                        
-                        <div class="h-48 bg-slate-gray overflow-hidden relative">
-                            <img src="${imgSrc}" alt="${p.name}" class="w-full h-full object-cover">
-                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-bold px-3 py-1 rounded-full text-graphite">${p.cat}</span>
+                        <div class="h-48 bg-gray-100 overflow-hidden relative">
+                            <img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-xs font-bold px-3 py-1 rounded-full text-gray-800 shadow-xs">${p.cat}</span>
                             ${isOut ? '<span class="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold uppercase tracking-wider text-sm">Esgotado</span>' : ''}
                         </div>
-
                         <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
-                            <div class="space-y-2">
-                                <h3 class="font-black text-graphite text-base line-clamp-1">${p.name}</h3>
-                                <p class="text-graphite text-xs line-clamp-2 leading-relaxed">${p.desc}</p>
-                                <div class="flex items-center justify-between text-xs text-gray-500 pt-1">
-                                    <span><i class="fa-solid fa-location-dot mr-1 text-verde-esmeralda"></i> ${p.location}</span>
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-gray-900 text-base line-clamp-1">${p.name}</h3>
+                                    <span class="font-extrabold text-blue-600 text-lg">R$ ${p.price.toFixed(2)}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+                                    <span><i class="fa-solid fa-location-dot mr-1 text-blue-600"></i> ${p.location}</span>
                                     <span class="${p.stock <= 3 && p.stock > 0 ? 'text-amber-600 font-bold' : ''}">Estoque: ${p.stock}</span>
                                 </div>
+                                <p class="text-gray-600 text-sm line-clamp-2">${p.desc}</p>
                             </div>
-
-                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
-                                <div>
-                                    <span class="text-[10px] uppercase font-bold text-gray-400 block">Preço</span>
-                                    <span class="font-extrabold text-verde-intenso text-xl">R$ ${p.price.toFixed(2)}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button onclick="shareProduct('${p.name}', ${p.price})" class="w-10 h-10 rounded-xl bg-slate-gray hover:bg-gray-200 text-graphite flex items-center justify-center text-xs transition-all" title="Compartilhar">
-                                        <i class="fa-solid fa-share-nodes"></i>
+                            <div class="space-y-2 pt-3 border-t border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <button onclick="shareProduct('${p.name}', ${p.price})" class="text-gray-500 hover:text-blue-600 text-xs font-semibold flex items-center gap-1">
+                                        <i class="fa-solid fa-share-nodes"></i> Compartilhar
                                     </button>
-                                    <button onclick="openWhatsAppChat('${p.whatsapp || '5589999999999'}', '${p.name}')" class="gradient-cet text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md hover:opacity-90 transition-all flex items-center gap-2">
-                                        <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                                    <button onclick="openChatModal('${p.id}')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                                        <i class="fa-solid fa-comments"></i> Abrir Chat
                                     </button>
                                 </div>
+                                <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="w-full gradient-brand text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95 shadow-xs">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i> Chamar no WhatsApp
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -988,18 +1116,28 @@
             }
 
             grid.innerHTML = favProducts.map(p => `
-                <div class="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm flex flex-col relative p-5 justify-between space-y-4">
-                    <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-slate-gray flex items-center justify-center text-rose-500 shadow-sm">
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col relative">
+                    <button onclick="toggleFavorite('${p.id}')" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-rose-500 shadow-md">
                         <i class="fa-solid fa-heart text-lg"></i>
                     </button>
-                    <div>
-                        <h3 class="font-bold text-graphite text-base">${p.name}</h3>
-                        <span class="font-extrabold text-verde-intenso text-lg">R$ ${p.price.toFixed(2)}</span>
-                        <p class="text-graphite text-sm line-clamp-2 mt-2">${p.desc}</p>
+                    <div class="h-48 bg-gray-100 overflow-hidden">
+                        <img src="${p.img}" class="w-full h-full object-cover">
                     </div>
-                    <button onclick="openWhatsAppChat('${p.whatsapp || '5589999999999'}', '${p.name}')" class="w-full gradient-cet text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-90">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Negociar no WhatsApp
-                    </button>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-base">${p.name}</h3>
+                            <span class="font-extrabold text-blue-600 text-lg">R$ ${p.price.toFixed(2)}</span>
+                            <p class="text-gray-600 text-sm line-clamp-2 mt-2">${p.desc}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openChatModal('${p.id}')" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-comments"></i> Chat
+                            </button>
+                            <a href="https://wa.me/${p.whatsapp}?text=Olá! Vi seu produto ${encodeURIComponent(p.name)} no VB-ON e tenho interesse." target="_blank" class="flex-1 gradient-brand text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-95 shadow-xs">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1011,9 +1149,7 @@
             const file = e.target.files[0];
             if(file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    currentImageBase64 = event.target.result;
-                };
+                reader.onload = function(event) { currentImageBase64 = event.target.result; };
                 reader.readAsDataURL(file);
             }
         });
@@ -1021,11 +1157,8 @@
         function renderMerchantProducts() {
             const grid = document.getElementById('merchant-products-grid');
             const myProducts = db.products.filter(p => p.user === db.currentUser);
-            
             const merchantObj = db.merchants.find(m => m.user === db.currentUser);
-            if(merchantObj) {
-                document.getElementById('merchant-welcome-name').innerText = 'Painel de ' + merchantObj.name;
-            }
+            if(merchantObj) document.getElementById('merchant-welcome-name').innerText = 'Painel de ' + merchantObj.name;
 
             if(myProducts.length === 0) {
                 grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400"><i class="fa-solid fa-box-archive text-4xl mb-3"></i><p>Você ainda não cadastrou nenhum produto.</p></div>`;
@@ -1033,21 +1166,24 @@
             }
 
             grid.innerHTML = myProducts.map(p => `
-                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col p-5 justify-between space-y-3">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <h4 class="font-bold text-graphite">${p.name}</h4>
-                            <span class="bg-slate-gray text-xs font-bold px-2 py-0.5 rounded-md text-graphite">${p.cat}</span>
-                        </div>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-verde-intenso font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
-                            <span class="text-xs px-2 py-0.5 rounded-md font-bold ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-slate-gray text-graphite'}">Estoque: ${p.stock} un.</span>
-                        </div>
-                        <p class="text-graphite text-xs line-clamp-2 mt-2">${p.desc}</p>
+                <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
+                    <div class="h-40 bg-gray-100 relative">
+                        <img src="${p.img}" class="w-full h-full object-cover">
+                        <span class="absolute top-3 left-3 bg-white/95 text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">${p.cat}</span>
                     </div>
-                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
-                        <button onclick="editProduct('${p.id}')" class="bg-slate-gray hover:bg-gray-200 text-roxo-profundo text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
-                        <button onclick="deleteProduct('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash mr-1"></i> Excluir</button>
+                    <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
+                        <div>
+                            <h4 class="font-bold text-gray-900">${p.name}</h4>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-blue-600 font-extrabold text-sm">R$ ${p.price.toFixed(2)}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-md font-bold ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'}">Estoque: ${p.stock} un.</span>
+                            </div>
+                            <p class="text-gray-500 text-xs line-clamp-2 mt-1">${p.desc}</p>
+                        </div>
+                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                            <button onclick="editProduct('${p.id}')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen mr-1"></i> Editar</button>
+                            <button onclick="deleteProduct('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-trash mr-1"></i> Excluir</button>
+                        </div                        </div>
                     </div>
                 </div>
             `).join('');
@@ -1059,9 +1195,6 @@
         function openProductModal(editId = null) {
             document.getElementById('product-modal').classList.remove('hidden');
             currentImageBase64 = '';
-            const merchantObj = db.merchants.find(m => m.user === db.currentUser);
-            const defaultWhatsapp = merchantObj ? merchantObj.whatsapp : '5589999999999';
-
             if(editId) {
                 document.getElementById('product-modal-title').innerText = 'Editar Produto & Estoque';
                 const p = db.products.find(item => item.id === editId);
@@ -1071,7 +1204,7 @@
                 document.getElementById('prod-price').value = p.price;
                 document.getElementById('prod-stock').value = p.stock;
                 document.getElementById('prod-location').value = p.location;
-                document.getElementById('prod-whatsapp').value = p.whatsapp || defaultWhatsapp;
+                document.getElementById('prod-whatsapp').value = p.whatsapp;
                 document.getElementById('prod-desc').value = p.desc;
                 currentImageBase64 = p.img;
             } else {
@@ -1080,7 +1213,7 @@
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-stock').value = '10';
-                document.getElementById('prod-whatsapp').value = defaultWhatsapp;
+                document.getElementById('prod-whatsapp').value = '';
                 document.getElementById('prod-desc').value = '';
                 document.getElementById('prod-img-file').value = '';
             }
@@ -1125,7 +1258,6 @@
             }
         }
 
-        // --- PROFILE MODAL ---
         function openProfileModal() {
             document.getElementById('profile-modal').classList.remove('hidden');
             const m = db.merchants.find(item => item.user === db.currentUser);
@@ -1150,7 +1282,7 @@
             }
         }
 
-        // --- FINANCIAL MANAGEMENT & EXPORT ---
+        // --- FINANCIAL & EXPORT ---
         function openExpenseModal() {
             document.getElementById('expense-modal').classList.remove('hidden');
             document.getElementById('exp-date').valueAsDate = new Date();
@@ -1188,21 +1320,18 @@
             const totalDespesas = myExpenses.filter(e => e.type === 'Despesa').reduce((acc, e) => acc + e.val, 0);
             const lucro = totalReceita - (totalCustos + totalDespesas);
 
-            let content = `VB-ON - RELATÓRIO FINANCEIRO (CETI José Marques)\n====================================\n\n`;
+            let content = `VB-ON - RELATÓRIO FINANCEIRO\n====================================\n\n`;
             content += `Receita Geral: R$ ${totalReceita.toFixed(2)}\n`;
             content += `Custos: R$ ${totalCustos.toFixed(2)}\n`;
             content += `Despesas: R$ ${totalDespesas.toFixed(2)}\n`;
             content += `Lucro Líquido: R$ ${lucro.toFixed(2)}\n\nLANÇAMENTOS:\n`;
-            
-            myExpenses.forEach(e => {
-                content += `[${e.date}] ${e.type}: ${e.desc} - R$ ${e.val.toFixed(2)}\n`;
-            });
+            myExpenses.forEach(e => { content += `[${e.date}] ${e.type}: ${e.desc} - R$ ${e.val.toFixed(2)}\n`; });
 
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Relatorio_Financeiro_VBON.txt';
+            a.download = 'Relatorio_Financeiro_VB-ON.txt';
             a.click();
             showToast('Relatório exportado com sucesso!');
         }
@@ -1222,7 +1351,7 @@
             document.getElementById('kpi-despesas').innerText = `R$ ${totalDespesas.toFixed(2)}`;
             const kpiLucro = document.getElementById('kpi-lucro');
             kpiLucro.innerText = `R$ ${lucroLiquido.toFixed(2)}`;
-            kpiLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-verde-esmeralda' : 'text-rose-600'}`;
+            kpiLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-rose-600'}`;
             document.getElementById('kpi-capital').innerText = `R$ ${totalCapital.toFixed(2)}`;
 
             const tbody = document.getElementById('expenses-table-body');
@@ -1237,11 +1366,11 @@
             }
 
             tbody.innerHTML = allItems.map(item => `
-                <tr class="hover:bg-slate-gray">
-                    <td class="px-6 py-3 font-medium text-graphite">${item.date}</td>
-                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.isSale ? 'bg-slate-gray text-verde-intenso' : 'bg-amber-50 text-amber-700'}">${item.type}</span></td>
-                    <td class="px-6 py-3 text-graphite">${item.desc}</td>
-                    <td class="px-6 py-3 font-bold ${item.isSale ? 'text-verde-intenso' : 'text-rose-600'}">${item.isSale ? '+' : '-'} R$ ${item.val.toFixed(2)}</td>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-3 font-medium text-gray-900">${item.date}</td>
+                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.isSale ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}">${item.type}</span></td>
+                    <td class="px-6 py-3 text-gray-600">${item.desc}</td>
+                    <td class="px-6 py-3 font-bold ${item.isSale ? 'text-blue-600' : 'text-rose-600'}">${item.isSale ? '+' : '-'} R$ ${item.val.toFixed(2)}</td>
                     <td class="px-6 py-3 text-right">
                         ${!item.isSale ? `<button onclick="deleteExpense('${item.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
@@ -1255,7 +1384,6 @@
         function initCharts() {
             const mySales = db.sales.filter(s => s.user === db.currentUser);
             const myExpenses = db.expenses.filter(e => e.user === db.currentUser);
-
             const totalReceita = mySales.reduce((acc, s) => acc + s.total, 0);
             const totalCustos = myExpenses.filter(e => e.type === 'Custo').reduce((acc, e) => acc + e.val, 0);
             const totalDespesas = myExpenses.filter(e => e.type === 'Despesa').reduce((acc, e) => acc + e.val, 0);
@@ -1266,19 +1394,9 @@
                 type: 'bar',
                 data: {
                     labels: ['Receita Geral', 'Custos', 'Despesas'],
-                    datasets: [{
-                        label: 'Valores em R$',
-                        data: [totalReceita, totalCustos, totalDespesas],
-                        backgroundColor: ['#20C957', '#d97706', '#e11d48'],
-                        borderRadius: 12
-                    }]
+                    datasets: [{ label: 'Valores em R$', data: [totalReceita, totalCustos, totalDespesas], backgroundColor: ['#2563eb', '#d97706', '#e11d48'], borderRadius: 12 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
 
             const ctx2 = document.getElementById('financeChart2').getContext('2d');
@@ -1287,21 +1405,13 @@
                 type: 'doughnut',
                 data: {
                     labels: ['Custos de Produtos', 'Despesas Operacionais'],
-                    datasets: [{
-                        data: [totalCustos, totalDespesas],
-                        backgroundColor: ['#d97706', '#e11d48'],
-                        borderWidth: 0
-                    }]
+                    datasets: [{ data: [totalCustos, totalDespesas], backgroundColor: ['#d97706', '#e11d48'], borderWidth: 0 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
         }
 
-        // --- CALENDAR & SALES ---
+        // --- SALES & CALENDAR ---
         function handleSaleSubmit(e) {
             e.preventDefault();
             const date = document.getElementById('sale-date').value;
@@ -1312,10 +1422,7 @@
 
             const prod = db.products.find(p => p.name === productName && p.user === db.currentUser);
             if(prod) {
-                if(prod.stock < qty) {
-                    alert(`Estoque insuficiente! Restam apenas ${prod.stock} unidades de ${prod.name}.`);
-                    return;
-                }
+                if(prod.stock < qty) { alert(`Estoque insuficiente! Restam apenas ${prod.stock} unidades de ${prod.name}.`); return; }
                 prod.stock -= qty;
             }
 
@@ -1353,11 +1460,11 @@
             }
 
             tbody.innerHTML = mySales.map(s => `
-                <tr class="hover:bg-slate-gray">
-                    <td class="px-6 py-3 font-medium text-graphite">${s.date}</td>
-                    <td class="px-6 py-3 text-graphite font-semibold">${s.product}</td>
-                    <td class="px-6 py-3 text-graphite">${s.qty}</td>
-                    <td class="px-6 py-3 font-bold text-verde-intenso">R$ ${s.total.toFixed(2)}</td>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-3 font-medium text-gray-900">${s.date}</td>
+                    <td class="px-6 py-3 text-gray-800 font-semibold">${s.product}</td>
+                    <td class="px-6 py-3 text-gray-600">${s.qty}</td>
+                    <td class="px-6 py-3 font-bold text-blue-600">R$ ${s.total.toFixed(2)}</td>
                     <td class="px-6 py-3 text-gray-500">${s.desc || '-'}</td>
                     <td class="px-6 py-3 text-right">
                         <button onclick="deleteSale('${s.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
@@ -1368,21 +1475,12 @@
 
         // --- CALCULATOR ---
         let calcValue = '0';
-
         function calcAppend(val) {
-            if(calcValue === '0' && !['+', '-', '*', '/', '%', '.'].includes(val)) {
-                calcValue = val;
-            } else {
-                calcValue += val;
-            }
+            if(calcValue === '0' && !['+', '-', '*', '/', '%', '.'].includes(val)) { calcValue = val; }
+            else { calcValue += val; }
             document.getElementById('calc-screen').value = calcValue;
         }
-
-        function calcClear() {
-            calcValue = '0';
-            document.getElementById('calc-screen').value = calcValue;
-        }
-
+        function calcClear() { calcValue = '0'; document.getElementById('calc-screen').value = calcValue; }
         function calcCompute() {
             try {
                 let expr = calcValue.replace(/%/g, '/100');
@@ -1390,30 +1488,17 @@
                 const operation = `${calcValue} = ${res}`;
                 calcValue = res.toString();
                 document.getElementById('calc-screen').value = calcValue;
-
                 db.calcHistory.unshift(operation);
                 if(db.calcHistory.length > 20) db.calcHistory.pop();
                 saveDB();
                 renderCalcHistory();
-            } catch(err) {
-                document.getElementById('calc-screen').value = 'Erro';
-                calcValue = '0';
-            }
+            } catch(err) { document.getElementById('calc-screen').value = 'Erro'; calcValue = '0'; }
         }
-
-        function clearCalcHistory() {
-            db.calcHistory = [];
-            saveDB();
-            renderCalcHistory();
-        }
-
+        function clearCalcHistory() { db.calcHistory = []; saveDB(); renderCalcHistory(); }
         function renderCalcHistory() {
             const list = document.getElementById('calc-history-list');
-            if(db.calcHistory.length === 0) {
-                list.innerHTML = `<p class="text-gray-400 text-center py-4">Nenhum cálculo recente.</p>`;
-                return;
-            }
-            list.innerHTML = db.calcHistory.map(item => `<div class="p-2 bg-slate-gray rounded-lg border border-gray-100">${item}</div>`).join('');
+            if(db.calcHistory.length === 0) { list.innerHTML = `<p class="text-gray-400 text-center py-4">Nenhum cálculo recente.</p>`; return; }
+            list.innerHTML = db.calcHistory.map(item => `<div class="p-2 bg-gray-50 rounded-lg border border-gray-100">${item}</div>`).join('');
         }
 
         // --- SIMULATOR ---
@@ -1433,7 +1518,6 @@
             const custoTotalVendas = (totalCustoUnitario * qtdVendas) + despesas;
             const lucroLiquido = receitaProjetada - custoTotalVendas;
             const margemLucro = receitaProjetada > 0 ? (lucroLiquido / receitaProjetada) * 100 : 0;
-            
             const margemContribuicaoUnit = precoVenda - totalCustoUnitario;
             const breakEven = margemContribuicaoUnit > 0 ? Math.ceil(despesas / margemContribuicaoUnit) : 0;
 
@@ -1443,52 +1527,44 @@
             
             const resLucro = document.getElementById('res-lucro');
             resLucro.innerText = `R$ ${lucroLiquido.toFixed(2)}`;
-            resLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-verde-esmeralda' : 'text-rose-600'}`;
+            resLucro.className = `text-2xl font-extrabold ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-rose-600'}`;
 
             document.getElementById('res-margem').innerText = `${margemLucro.toFixed(1)}%`;
             document.getElementById('res-breakeven').innerText = `${breakEven} unidades`;
 
             const resStatus = document.getElementById('res-status');
-            if(lucroLiquido > 0) {
-                resStatus.innerText = 'Altamente Viável';
-                resStatus.className = 'text-xl font-extrabold text-verde-esmeralda';
-            } else {
-                resStatus.innerText = 'Ajustar Preços / Custos';
-                resStatus.className = 'text-xl font-extrabold text-rose-600';
-            }
+            if(lucroLiquido > 0) { resStatus.innerText = 'Altamente Viável'; resStatus.className = 'text-xl font-extrabold text-blue-600'; }
+            else { resStatus.innerText = 'Ajustar Preços / Custos'; resStatus.className = 'text-xl font-extrabold text-rose-600'; }
 
             const otimistaQtd = Math.round(qtdVendas * 1.2);
             const otimistaLucro = (precoVenda * otimistaQtd) - ((totalCustoUnitario * otimistaQtd) + despesas);
-
             const moderadoQtd = qtdVendas;
             const moderadoLucro = lucroLiquido;
-
             const conservadorQtd = Math.round(qtdVendas * 0.8);
-            const conservadorLucro = (precoVenda * conservadorQtd) - ((totalCustoUnitario * conservadorQtd) + despesas);
+            const conservadorLuc            const conservadorLucro = (precoVenda * conservadorQtd) - ((totalCustoUnitario * conservadorQtd) + despesas);
 
             document.getElementById('scenarios-grid').innerHTML = `
-                <div class="bg-slate-gray p-4 rounded-xl border border-gray-200">
-                    <h5 class="font-bold text-roxo-profundo mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Otimista (+20%)</h5>
-                    <p class="text-xs text-graphite">Vendas: ${otimistaQtd} un.</p>
-                    <p class="text-sm font-extrabold text-verde-intenso mt-2">Lucro: R$ ${otimistaLucro.toFixed(2)}</p>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <h5 class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Otimista (+20%)</h5>
+                    <p class="text-xs text-gray-600">Vendas: ${otimistaQtd} un.</p>
+                    <p class="text-sm font-extrabold text-blue-700 mt-2">Lucro: R$ ${otimistaLucro.toFixed(2)}</p>
                 </div>
-                <div class="bg-slate-gray p-4 rounded-xl border border-gray-200">
-                    <h5 class="font-bold text-roxo-profundo mb-1"><i class="fa-solid fa-scale-balanced mr-1"></i> Moderado (Esperado)</h5>
-                    <p class="text-xs text-graphite">Vendas: ${moderadoQtd} un.</p>
-                    <p class="text-sm font-extrabold text-verde-esmeralda mt-2">Lucro: R$ ${moderadoLucro.toFixed(2)}</p>
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                    <h5 class="font-bold text-indigo-800 mb-1"><i class="fa-solid fa-scale-balanced mr-1"></i> Moderado (Esperado)</h5>
+                    <p class="text-xs text-gray-600">Vendas: ${moderadoQtd} un.</p>
+                    <p class="text-sm font-extrabold text-indigo-700 mt-2">Lucro: R$ ${moderadoLucro.toFixed(2)}</p>
                 </div>
                 <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
                     <h5 class="font-bold text-amber-800 mb-1"><i class="fa-solid fa-arrow-trend-down mr-1"></i> Conservador (-20%)</h5>
-                    <p class="text-xs text-graphite">Vendas: ${conservadorQtd} un.</p>
+                    <p class="text-xs text-gray-600">Vendas: ${conservadorQtd} un.</p>
                     <p class="text-sm font-extrabold text-amber-700 mt-2">Lucro: R$ ${conservadorLucro.toFixed(2)}</p>
                 </div>
             `;
-
             document.getElementById('sim-results').classList.remove('hidden');
         }
 
-        // Inicialização
-        updateAuthBar();
+        // Init Application State
+        applySidebarState();
         updateFavBadge();
         renderCatalog();
     </script>
